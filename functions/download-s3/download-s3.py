@@ -3,6 +3,7 @@ import boto3
 import os
 from decimal import Decimal
 import json
+
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.client("s3")
 client = boto3.client('ecr')
@@ -23,7 +24,7 @@ def describe_image_version():
 
     env_file = os.getenv('GITHUB_ENV')
     with open(env_file, "a") as myfile:
-        myfile.write(f"MY_VAR={version}")
+        myfile.write(f"new_version={version}")
 
     return version
 

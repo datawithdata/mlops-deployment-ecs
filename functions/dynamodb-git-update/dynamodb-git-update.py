@@ -10,6 +10,7 @@ import json
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 import os
+import sys
 
 dynamodb = boto3.resource('dynamodb')
 
@@ -30,12 +31,12 @@ def update_dynamodb(contents):
                 if version.get('ECR-info'):
                     print("update")
                     version['ECR-info'].append(
-                        {"version": os.environ['MY_VAR'], "ecr-name": os.environ.get("REPOSITORY_NAME").split("/")[1]})
+                        {"version": os.environ['new_version'], "ecr-name": sys.argv[1]})
                 else:
-                    print("in else")
+                    print("New record")
                     version["ECR-info"] = []
-                    version["ECR-info"].append({"version": os.environ['MY_VAR'],
-                                               "ecr-name": os.environ.get("REPOSITORY_NAME").split("/")[1]})
+                    version["ECR-info"].append({"version": os.environ['new_version'],
+                                               "ecr-name": sys.argv[1]})
         response = table.update_item(
             Key={"registry-name": contents['registry-name']},
             UpdateExpression='SET versions = :versions',

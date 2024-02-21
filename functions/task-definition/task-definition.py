@@ -23,15 +23,17 @@ def get_registry_info(event):
     for versions in response['Item']['versions']:
         if versions['version'] == event['version']:
             version_lst = versions['ECR-info']
+            ecr_location = versions['ecr-name']
     versions = [ver_lst['version'] for ver_lst in version_lst]
-    return versions.sort()
+    return for [versions.sort(),ecr_location]
 
 
 def register_task(event):
     version = ""
+    version_info = get_registry_info(event)
+    ecr_location = version_info[1]
     if event['ecr-version'] == "latest":
-        version = get_registry_info(event)
-        version = version[-1]
+        version=version_info[0][-1]
     else:
         version = event['ecr-version']
     # Define your task definition details
@@ -46,7 +48,7 @@ def register_task(event):
                 # Replace with your container name
                 "name": event['registry-name'],
                 # Replace with your image URI
-                "image": "270932919550.dkr.ecr.us-east-1.amazonaws.com/docker-image:"+version[-1],
+                "image": ecr_location+":"+version[-1],
                 "portMappings": [
                     {
                         "containerPort": 80,  # Replace with your container port

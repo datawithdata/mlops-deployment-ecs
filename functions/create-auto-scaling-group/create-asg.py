@@ -40,7 +40,7 @@ def create_launch_template(event):
         )
 
     # Print the response
-    print(f"Launch Template created: {response['LaunchTemplateName']}")
+    return response['LaunchTemplateName']
 
 
 def create_asg():

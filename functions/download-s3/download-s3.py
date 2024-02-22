@@ -50,9 +50,6 @@ def get_s3_location():
     file_path = "config.json"
     with open(file_path, "r") as file:
         contents = json.loads(file.read())
-    print("----------")
-    print(contents)
-    print("--------")
     print(contents['registry-name'])
     table_name = "siri-model-registry"
     table = dynamodb.Table(table_name)
@@ -61,7 +58,7 @@ def get_s3_location():
         Key={"registry-name": contents['registry-name']})
 
     for version in response['Item']['versions']:
-        if version['version'] == Decimal(contents['version']):
+        if version['version'] == Decimal(contents['model-version']):
             s3_location = version['s3_location']
     return str(s3_location)
 

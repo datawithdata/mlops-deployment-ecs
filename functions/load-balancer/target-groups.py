@@ -8,9 +8,9 @@ def create_target_group(event):
         Name=event['registry-name'],
         Protocol='HTTP',
         Port=123,
-        VpcId='string',
+        VpcId='vpc-0b4da02d066d1e2af',
         HealthCheckProtocol='HTTP',
-        HealthCheckPort=5000,
+        HealthCheckPort="5000",
         HealthCheckEnabled=True,
         HealthCheckPath='/health',
         HealthCheckIntervalSeconds=45,
@@ -30,7 +30,7 @@ def create_target_group(event):
 
 def create_listner(event, target_group_arn):
     response = client.create_listener(
-        LoadBalancerArn='string',
+        LoadBalancerArn='arn:aws:elasticloadbalancing:us-east-1:270932919550:loadbalancer/app/siri-ml-deploy/201d5b136a87c0e3',
         Protocol='HTTP',
         Port=123,
         DefaultActions=[

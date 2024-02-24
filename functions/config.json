@@ -2,8 +2,8 @@
     "registry-name":"test39",
     "model-version":1,
     "ecr-version":"latest",
-    "memory":"1048",
-    "cpu":"2048",
+    "memory":"2048",
+    "cpu":"1",
     "deployment-type":"deploy"
   }
   

@@ -20,8 +20,11 @@ def get_instance_id(event):
     )
     print("------")
     print(response)
-    print(response['InstanceTypes'][0]['InstanceType'])
-    return response['InstanceTypes'][0]['InstanceType']
+    for instance_ids in response:
+        if instance_ids['CurrentGeneration'] == os.environ['bool']:
+            instance_id = response['InstanceTypes'][0]['InstanceType']
+
+    return instance_id
 
 
 def create_launch_template(event):

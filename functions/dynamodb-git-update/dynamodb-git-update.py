@@ -26,17 +26,22 @@ def update_dynamodb(contents):
 
         print("update existing registry")
         for version in response['Item']['versions']:
-            if version['version'] == contents['version']:
+            if version['version'] == contents['ecr-version']:
                 print(version)
                 if version.get('ECR-info'):
                     print("update")
                     version['ECR-info'].append(
                         {"version": os.environ['new_version'], "ecr-name": sys.argv[1]})
+                    version["config"].append(
+                        {"config": {"ram": contents['ram'], "cpu": contents['cpu'], "version": os.environ['new_version']}})
                 else:
                     print("New record")
                     version["ECR-info"] = []
                     version["ECR-info"].append({"version": os.environ['new_version'],
                                                "ecr-name": sys.argv[1]})
+                    version["config"] = []
+                    version["config"].append(
+                        {"config": {"ram": contents['ram'], "cpu": contents['cpu'], "version": os.environ['new_version']}})
         response = table.update_item(
             Key={"registry-name": contents['registry-name']},
             UpdateExpression='SET versions = :versions',

@@ -22,15 +22,20 @@ def deploy_service(event):
                 'containerName': event['data']["registry-name"],
                 'containerPort': 80  # Container port to expose through the load balancer
             }
-        ]
+        ],
+        'networkConfiguration': {
+            'awsvpcConfiguration': {
+                'securityGroups': 'sg-0aeecd47559449290',
+                'subnets': ['subnet-030e86ba4defd393f', 'subnet-0b52f544357e5690d']
+            }
+        },
     }
 
-
-try:
-    # Create the ECS service
-    response = ecs_client.create_service(**service_config)
-except Exception as error:
-    print(f"Error creating ECS service: {error}")
+    try:
+        # Create the ECS service
+        response = ecs_client.create_service(**service_config)
+    except Exception as error:
+        print(f"Error creating ECS service: {error}")
 
 
 def lambda_handler(event, context):

@@ -105,7 +105,4 @@ def lambda_handler(event, context):
     _ = register_task(event)
     _ = create_cluster(event)
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps('Successfully update')
-    }
+    return event

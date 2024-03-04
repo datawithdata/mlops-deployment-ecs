@@ -17,10 +17,10 @@ def get_registry_info(event):
     table_name = "siri-model-registry"
     table = dynamodb.Table(table_name)
     response = table.get_item(
-        Key={"registry-name": event['registry-name']})
+        Key={"registry-name": event['data']['registry-name']})
     version_lst = []
     for versions in response['Item']['versions']:
-        if versions['version'] == event['model-version']:
+        if versions['version'] == event['data']['model-version']:
             print(versions)
             version_lst = versions['ECR-info']
             ecr_location = versions['ECR-info'][0]['ecr-name']
@@ -35,41 +35,43 @@ def register_task(event):
     print("-----")
     print(version_info)
     ecr_location = version_info[1]
-    if event['ecr-version'] == "latest":
+    if event['data']['ecr-version'] == "latest":
         version = str(version_info[0][-1])
     else:
-        version = event['ecr-version']
+        version = event['data']['ecr-version']
     # Define your task definition details
     task_definition = {
-        "family": event['registry-name'],
-        "cpu": event['cpu'],
-        "memory": event['memory'],
+        "family": event['data']['registry-name'],
+        "cpu": str(int(event['data']['cpu'])*1024),
+        "memory": event['data']['ram'],
         "networkMode": "awsvpc",
         "requiresCompatibilities": ["EC2"],
         "containerDefinitions": [
             {
                 # Replace with your container name
-                "name": event['registry-name'],
+                "name": event['data']['registry-name'],
                 # Replace with your image URI
-                "image": ecr_location+":"+str(version[-1]),
+                "image": ecr_location+":"+str(version),
                 "portMappings": [
                     {
                         "containerPort": 80,  # Replace with your container port
                         "hostPort": 80  # Replace with your desired host port
                     }
-                ]
+                ],
+                "cpu": int(event['data']['cpu'])*1024,
+                "memory": int(event['data']['ram'])
             }
         ]
     }
 
     response = client.register_task_definition(**task_definition)
-    return response
+    return response['taskDefinition']['taskDefinitionArn']
 
 
 def create_cluster(event):
 
     response = client.create_cluster(
-        clusterName=event['registry-name'],
+        clusterName=event['data']['registry-name'],
         tags=[
             {
                 'key': 'string',
@@ -86,7 +88,7 @@ def create_cluster(event):
             'executeCommandConfiguration': {
                 'logging': 'OVERRIDE',
                 'logConfiguration': {
-                    'cloudWatchLogGroupName': event['registry-name']+"-logs",
+                    'cloudWatchLogGroupName': event['data']['registry-name']+"-logs",
                     'cloudWatchEncryptionEnabled': False,
                 }
             }
@@ -100,17 +102,7 @@ def lambda_handler(event, context):
     # TODO implement
     # Replace these with your actual values
 
-    _ = register_task(event)
+    task_arn = register_task(event)
     _ = create_cluster(event)
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps('Successfully update')
-    }
-
-
-if __name__ == "__main__":
-    file_path = "/Users/bhanuteja/ecs-automation/mlops-deployment-ecs/functions/config.json"
-    with open(file_path, "r") as file:
-        contents = json.loads(file.read())
-    lambda_handler(contents, 1)
+    event['taskDefinitionArn'] = task_arn
+    return event

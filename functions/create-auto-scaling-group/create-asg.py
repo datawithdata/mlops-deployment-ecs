@@ -1,6 +1,8 @@
 import json
 import boto3
 import os
+import base64
+
 ec2_client = boto3.client('ec2')
 client_asg = boto3.client('autoscaling')
 
@@ -23,11 +25,14 @@ def get_instance_id(event):
         instance_id = ""
         for instance_ids in response['InstanceTypes']:
             print("In loops")
+            print(instance_ids['ProcessorInfo']['SupportedArchitectures'][0])
             print(instance_ids['CurrentGeneration'])
             if str(instance_ids['CurrentGeneration']) == os.environ['bool']:
                 print("In here")
                 instance_id = instance_ids['InstanceType']
                 cpu_arch = instance_ids['ProcessorInfo']['SupportedArchitectures'][0]
+        print("0932khjdscjkhlsdcjhbcsjh")
+        print(cpu_arch)
         if cpu_arch == "arm64":
             print("arm")
             ami_id = os.environ['AMI_ARM']
@@ -43,10 +48,12 @@ def get_instance_id(event):
 
 def create_launch_template(event):
     # Define parameters
+    userData = f"""#!/bin/bash
+echo ECS_CLUSTER={event['data']["registry-name"]} >> /etc/ecs/ecs.config""".encode("us-ascii")
     template_name = event['data']["registry-name"]
     instance_info = get_instance_id(event)
-    instance_type = " t3.micro"  # instance_info[0]
-    image_id = instance_info[1]
+    instance_type = "t3.micro"  # instance_info[0]
+    image_id = "ami-0e5462b0cdd5ced35"  # instance_info[1]
 
     # Create Launch Template
     print("creating")
@@ -69,6 +76,7 @@ def create_launch_template(event):
             ],
             'ImageId': image_id,
             'InstanceType': instance_type,
+            'UserData': base64.b64encode(userData).decode('us-ascii')
         }
     )
     # Print the response

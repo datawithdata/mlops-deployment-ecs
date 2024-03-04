@@ -7,31 +7,46 @@ client_asg = boto3.client('autoscaling')
 
 def get_instance_id(event):
     # TODO implement
-    response = ec2_client.describe_instance_types(
-        DryRun=False,
+    try:
+        response = ec2_client.describe_instance_types(
+            DryRun=False,
 
-        Filters=[
-            {"Name": "memory-info.size-in-mib",
-             "Values": [event["memory"], str(int(event["memory"])+1)]},
-            {"Name": "vcpu-info.default-vcpus",
-             "Values": [event["cpu"], str(int(event["cpu"])+1)]}
-        ],
-        MaxResults=100,
-    )
-    print("------")
-    print(response)
-    for instance_ids in response:
-        if instance_ids['CurrentGeneration'] == os.environ['bool']:
-            instance_id = response['InstanceTypes'][0]['InstanceType']
+            Filters=[
+                {"Name": "memory-info.size-in-mib",
+                 "Values": [event['config']["ram"], str(int(event['config']["ram"])+1)]},
+                {"Name": "vcpu-info.default-vcpus",
+                 "Values": [event['config']["cpu"], str(int(event['config']["cpu"])+1)]}
+            ],
+            MaxResults=100,
+        )
 
-    return instance_id
+        instance_id = ""
+        for instance_ids in response['InstanceTypes']:
+            print("In loops")
+            print(instance_ids['CurrentGeneration'])
+            if str(instance_ids['CurrentGeneration']) == os.environ['bool']:
+                print("In here")
+                instance_id = instance_ids['InstanceType']
+                cpu_arch = instance_ids['ProcessorInfo']['SupportedArchitectures'][0]
+        if cpu_arch == "arm64":
+            print("arm")
+            ami_id = os.environ['AMI_ARM']
+        else:
+            print("x86")
+            ami_id = os.environ['AMI_x86']
+        print(instance_id)
+        return [instance_id, ami_id]
+    except Exception as err:
+        print("In get")
+        print(str(err))
 
 
 def create_launch_template(event):
     # Define parameters
-    template_name = event["registry-name"]
-    image_id = "ami-0440d3b780d96b29d"
-    instance_type = get_instance_id(event)
+    template_name = event['data']["registry-name"]
+    instance_info = get_instance_id(event)
+    instance_type = " t3.micro"  # instance_info[0]
+    image_id = instance_info[1]
 
     # Create Launch Template
     print("creating")
@@ -42,7 +57,7 @@ def create_launch_template(event):
         LaunchTemplateData={
             'EbsOptimized': False,
             'IamInstanceProfile': {
-                'Arn': 'arn:aws:iam::270932919550:instance-profile/ec2',  # get from params
+                'Arn': os.environ['ARN'],  # get from params
             },
             'BlockDeviceMappings': [
                 {
@@ -64,7 +79,7 @@ def create_launch_template(event):
 def create_asg(event):
     launch_template_name = create_launch_template(event)
     response = client_asg.create_auto_scaling_group(
-        AutoScalingGroupName=event["registry-name"],
+        AutoScalingGroupName=event['data']["registry-name"],
         LaunchTemplate={
             "LaunchTemplateName": launch_template_name,
             "Version": "$Latest",  # Use the latest version of the Launch Template
@@ -88,10 +103,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': 1
     }
-
-
-if __name__ == "__main__":
-    file_path = "/Users/bhanuteja/ecs-automation/mlops-deployment-ecs/functions/config.json"
-    with open(file_path, "r") as file:
-        contents = json.loads(file.read())
-    lambda_handler(contents, 1)

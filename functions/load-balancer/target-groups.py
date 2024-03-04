@@ -1,6 +1,26 @@
 import boto3
 import json
+from decimal import Decimal
+import os
+
 client = boto3.client('elbv2')
+dynamodb = boto3.resource('dynamodb')
+
+
+def get_config(event):
+    table_name = os.environ['TABLE_NAME']
+    table = dynamodb.Table(table_name)
+    try:
+        # Check if record exists
+        response = table.get_item(
+            Key={"registry-name": event['registry-name']})
+        for version in response['Item']['versions']:
+            if version['version'] == Decimal(event['model-version']):
+                config = version['config'][0]
+        return config
+    except Exception as err:
+        print(str(err))
+    return 1
 
 
 def create_target_group(event):
@@ -30,7 +50,7 @@ def create_target_group(event):
 
 def create_listner(event, target_group_arn):
     response = client.create_listener(
-        LoadBalancerArn='arn:aws:elasticloadbalancing:us-east-1:270932919550:loadbalancer/app/siri-ml-deploy/201d5b136a87c0e3',
+        LoadBalancerArn=os.environ['LOADBALANCER_ARN'],
         Protocol='HTTP',
         Port=123,
         DefaultActions=[
@@ -65,14 +85,9 @@ def lambda_handler(event, context):
     # TODO implement
     # Replace these with your actual values
 
+    config_details = get_config(event)
+    print(config_details)
     target_group_arn = create_target_group(event)
     listner_arn = create_listner(event, target_group_arn)
 
-    return {"target_group_arn": target_group_arn, "listner_arn": listner_arn}
-
-
-if __name__ == "__main__":
-    file_path = "/Users/bhanuteja/ecs-automation/mlops-deployment-ecs/functions/config.json"
-    with open(file_path, "r") as file:
-        contents = json.loads(file.read())
-    lambda_handler(contents, 1)
+    return {"target_group_arn": target_group_arn, "listner_arn": listner_arn, "config": config_details['config'], "data": event}

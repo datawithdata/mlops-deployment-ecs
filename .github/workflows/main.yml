@@ -13,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: aws-actions/setup-sam@v2
 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -20,14 +22,6 @@ jobs:
             role-to-assume: arn:aws:iam::270932919550:role/git-actions-iam 
             aws-region: us-east-1
 
-      - name: Install SAM CLI
-        run: curl -sL https://raw.githubusercontent.com/aws/aws-cli/v2/dist/aws/install | bash
+      - run: sam build --use-container
 
-      - name: Build SAM application
-        run: sam build
-
-      - name: Validate SAM template
-        run: sam validate
-
-      - name: Deploy SAM application
-        run: sam deploy
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset 

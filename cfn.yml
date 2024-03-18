@@ -6,19 +6,19 @@ Resources:
   ModelRegistryList:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambda_function.lambda_handler  # Replace with your handler function
-      Runtime: python3.9  # Adjust runtime based on your language
-      CodeUri: functions/list-registry  # Path to your Lambda function code
-      Role: !GetAtt MyLambdaRole.Arn  # IAM Role with permissions (replace if not needed)
-      Timeout: 30  # Execution timeout in seconds
+      Handler: list-registry.lambda_handler  
+      Runtime: python3.9  
+      CodeUri: functions/list-registry  
+      Role: !GetAtt MyLambdaRole.Arn  
+      Timeout: 90  
   ModelRegistry:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: model-registry.lambda_handler  # Replace with your handler function
-      Runtime: python3.9  # Adjust runtime based on your language
-      CodeUri: functions/model-registry  # Path to your Lambda function code
-      Role: !GetAtt MyLambdaRole.Arn  # IAM Role with permissions (replace if not needed)
-      Timeout: 30  # Execution timeout in seconds
+      Handler: model-registry.lambda_handler
+      Runtime: python3.9 
+      CodeUri: functions/model-registry
+      Role: !GetAtt MyLambdaRole.Arn
+      Timeout: 90
 
 Outputs:
   MyLambdaArn:

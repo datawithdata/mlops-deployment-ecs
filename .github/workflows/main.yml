@@ -24,4 +24,4 @@ jobs:
 
       - run: sam build --use-container
 
-      - run: sam deploy --stack-name --no-confirm-changeset --no-fail-on-empty-changeset 
+      - run: sam deploy --stack-name --s3-bucket siri-git-actions --no-confirm-changeset --no-fail-on-empty-changeset 

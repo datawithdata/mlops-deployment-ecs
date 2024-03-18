@@ -75,6 +75,7 @@ Resources:
   ModelRegistryList:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: list-model-registry
       Handler: list-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/list-registry
@@ -83,6 +84,7 @@ Resources:
   ModelRegistry:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: model-registry
       Handler: model-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/model-registry

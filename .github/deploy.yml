@@ -1,0 +1,31 @@
+name: Deploy Lambda
+
+on:
+  push:
+    branches: [ main ]  # Change branch name to trigger deployment on push
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+            role-to-assume: arn:aws:iam::270932919550:role/git-actions-iam 
+            aws-region: us-east-1
+
+      - name: Install SAM CLI
+        run: curl -sL https://raw.githubusercontent.com/aws/aws-cli/v2/dist/aws/install | bash
+
+      - name: Build SAM application
+        run: sam build
+
+      - name: Validate SAM template
+        run: sam validate
+
+      - name: Deploy SAM application
+        run: sam deploy
+

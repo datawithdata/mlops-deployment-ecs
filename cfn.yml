@@ -3,12 +3,20 @@ Transform: AWS::Serverless-2016-10-31
 Description: A SAM template for deploying a ECS Automaiton 
 
 Resources:
-  MyLambdaFunction:
+  ModelRegistryList:
     Type: AWS::Serverless::Function
     Properties:
       Handler: lambda_function.lambda_handler  # Replace with your handler function
       Runtime: python3.9  # Adjust runtime based on your language
-      CodeUri: lambda_function/  # Path to your Lambda function code
+      CodeUri: functions/list-registry  # Path to your Lambda function code
+      Role: !GetAtt MyLambdaRole.Arn  # IAM Role with permissions (replace if not needed)
+      Timeout: 30  # Execution timeout in seconds
+  ModelRegistry:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: model-registry.lambda_handler  # Replace with your handler function
+      Runtime: python3.9  # Adjust runtime based on your language
+      CodeUri: functions/model-registry  # Path to your Lambda function code
       Role: !GetAtt MyLambdaRole.Arn  # IAM Role with permissions (replace if not needed)
       Timeout: 30  # Execution timeout in seconds
 

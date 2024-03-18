@@ -52,7 +52,7 @@ Resources:
                     - iam:ListInstanceProfiles
                     - iam:AddRoleToInstanceProfile
                     - iam:TagInstanceProfile
-                  Resource: *
+                  Resource: "*"
           - PolicyName: ec2-runinstance
             PolicyDocument:
               Version: "2012-10-17"
@@ -70,7 +70,7 @@ Resources:
                     - arn:aws:ec2:*::image/*
                     - arn:aws:ec2:*:270932919550:subnet/*
                     - arn:aws:ec2:*:270932919550:key-pair/*
-                  Resource: *   
+                  Resource: "*"   
 
   ModelRegistryList:
     Type: AWS::Serverless::Function

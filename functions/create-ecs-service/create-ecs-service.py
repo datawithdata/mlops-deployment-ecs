@@ -7,7 +7,7 @@ client_asg = boto3.client('autoscaling')
 
 def deploy_service(event):
 
-    desired_count = 2  # Number of tasks to run
+    desired_count = 1  # Number of tasks to run
 
     # Define service configuration
     service_config = {
@@ -20,13 +20,13 @@ def deploy_service(event):
             {
                 'targetGroupArn': event['target_group_arn'],
                 'containerName': event['data']["registry-name"],
-                'containerPort': 80  # Container port to expose through the load balancer
+                'containerPort': 5000 # Container port to expose through the load balancer
             }
         ],
         'networkConfiguration': {
             'awsvpcConfiguration': {
-                'securityGroups': 'sg-0aeecd47559449290',
-                'subnets': ['subnet-030e86ba4defd393f', 'subnet-0b52f544357e5690d']
+                'securityGroups': ['sg-0aeecd47559449290'],
+                'subnets': ['subnet-046ece9627560a66a','subnet-030e86ba4defd393f','subnet-0b163826522f34c48']
             }
         },
     }
@@ -34,9 +34,9 @@ def deploy_service(event):
     try:
         # Create the ECS service
         response = ecs_client.create_service(**service_config)
-    except Exception as error:
-        print(f"Error creating ECS service: {error}")
-
+    except Exception as err:
+        vals = {"loc":["target_group","listner","task","ECS","launch_tmplate","service"],"registry":event['data']["registry-name"]}
+        raise ValueError(json.dumps(vals))
 
 def lambda_handler(event, context):
     try:
@@ -44,6 +44,8 @@ def lambda_handler(event, context):
     except Exception as er:
         print("in error")
         print(str(er))
+        raise 
+   
     return {
         'statusCode': 200,
         'body': 1

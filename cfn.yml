@@ -92,4 +92,4 @@ Resources:
 Outputs:
   MyLambdaArn:
     Description: ARN of the Lambda function
-    Value: !GetAtt IAMRoleForECSAutomation.Arn
+    Value: !GetAtt MyLambdaFunction.Arn

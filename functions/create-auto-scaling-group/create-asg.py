@@ -7,22 +7,23 @@ ec2_client = boto3.client('ec2')
 client_asg = boto3.client('autoscaling')
 
 
+
 def get_instance_id(event):
     # TODO implement
     try:
         response = ec2_client.describe_instance_types(
             DryRun=False,
-
+    
             Filters=[
                 {"Name": "memory-info.size-in-mib",
-                 "Values": [event['config']["ram"], str(int(event['config']["ram"])+1)]},
+                 "Values": [event['data']['ram'], str(int(event['data']['ram'])+1)]},
                 {"Name": "vcpu-info.default-vcpus",
-                 "Values": [event['config']["cpu"], str(int(event['config']["cpu"])+1)]}
+                 "Values": [event['data']['cpu'], str(int(event['data']['cpu'])+1)]}
             ],
             MaxResults=100,
         )
-
-        instance_id = ""
+        
+        instance_id=""
         for instance_ids in response['InstanceTypes']:
             print("In loops")
             print(instance_ids['ProcessorInfo']['SupportedArchitectures'][0])
@@ -35,71 +36,81 @@ def get_instance_id(event):
         print(cpu_arch)
         if cpu_arch == "arm64":
             print("arm")
-            ami_id = os.environ['AMI_ARM']
+            ami_id=os.environ['AMI_ARM']
         else:
             print("x86")
-            ami_id = os.environ['AMI_x86']
+            ami_id=os.environ['AMI_x86']
         print(instance_id)
-        return [instance_id, ami_id]
+        return [instance_id,ami_id]
     except Exception as err:
-        print("In get")
-        print(str(err))
-
+        vals = {"loc":["target_group","listner","task","ECS"]}
+        raise ValueError(json.dumps(vals))
 
 def create_launch_template(event):
-    # Define parameters
-    userData = f"""#!/bin/bash
-echo ECS_CLUSTER={event['data']["registry-name"]} >> /etc/ecs/ecs.config""".encode("us-ascii")
-    template_name = event['data']["registry-name"]
-    instance_info = get_instance_id(event)
-    instance_type = "t3.micro"  # instance_info[0]
-    image_id = "ami-0e5462b0cdd5ced35"  # instance_info[1]
-
-    # Create Launch Template
-    print("creating")
-    response = ec2_client.create_launch_template(
-        DryRun=False,
-        LaunchTemplateName=template_name,
-        VersionDescription="Model deploymetn",
-        LaunchTemplateData={
-            'EbsOptimized': False,
-            'IamInstanceProfile': {
-                'Arn': os.environ['ARN'],  # get from params
-            },
-            'BlockDeviceMappings': [
-                {
-                    'DeviceName': '/dev/xvda',
-                    'Ebs': {
-                        'VolumeSize': 120
+    try:
+        # Define parameters
+        userData=f"""#!/bin/bash
+    
+    echo ECS_CLUSTER={event['data']["registry-name"]} >> /etc/ecs/ecs.config""".encode("us-ascii")
+        template_name = event['data']["registry-name"]
+        instance_info = get_instance_id(event)
+        instance_type = "t3.micro"#instance_info[0]
+        image_id = "ami-0e5462b0cdd5ced35"#instance_info[1]
+    
+        # Create Launch Template
+        print("creating")
+        response = ec2_client.create_launch_template(
+            DryRun=False,
+            LaunchTemplateName=template_name,
+            VersionDescription="Model deploymetn",
+            LaunchTemplateData={
+                'EbsOptimized': False,
+                'IamInstanceProfile': {
+                    'Arn': os.environ['ARN'],  # get from params
+                },
+                'BlockDeviceMappings': [
+                    {
+                        'DeviceName': '/dev/xvda',
+                        'Ebs': {
+                            'VolumeSize': 120
+                        }
                     }
-                }
-            ],
-            'ImageId': image_id,
-            'InstanceType': instance_type,
-            'UserData': base64.b64encode(userData).decode('us-ascii')
-        }
-    )
-    # Print the response
-    print(response['LaunchTemplate']['LaunchTemplateName'])
-    return response['LaunchTemplate']['LaunchTemplateName']
-
+                ],
+                'ImageId': image_id,
+                'InstanceType': instance_type,
+                'UserData':base64.b64encode(userData).decode('us-ascii')
+            }
+        )
+        # Print the response
+        print(response['LaunchTemplate']['LaunchTemplateName'])
+        return response['LaunchTemplate']['LaunchTemplateName']
+    
+    except Exception as err:
+        vals = {"loc":["target_group","listner","task","ECS","launch_tmplate"],"registry":event['data']["registry-name"]}
+        raise ValueError(json.dumps(vals))
 
 def create_asg(event):
-    launch_template_name = create_launch_template(event)
-    response = client_asg.create_auto_scaling_group(
-        AutoScalingGroupName=event['data']["registry-name"],
-        LaunchTemplate={
-            "LaunchTemplateName": launch_template_name,
-            "Version": "$Latest",  # Use the latest version of the Launch Template
-        },
-        MinSize=1,
-        MaxSize=5,
-        DesiredCapacity=1,
-        VPCZoneIdentifier="subnet-046ece9627560a66a,subnet-030e86ba4defd393f,subnet-0b163826522f34c48",
-        # ... other parameters (e.g., VPC ID, subnet IDs, security group IDs)
-    )
-    return 1
-
+    try:
+        launch_template_name = create_launch_template(event)
+        response = client_asg.create_auto_scaling_group(
+            AutoScalingGroupName=event['data']["registry-name"],
+            LaunchTemplate={
+                "LaunchTemplateName": launch_template_name,
+                "Version": "$Latest",  # Use the latest version of the Launch Template
+            },
+            MinSize=1,
+            MaxSize=5,
+            DesiredCapacity=1,
+            VPCZoneIdentifier="subnet-046ece9627560a66a,subnet-030e86ba4defd393f,subnet-0b163826522f34c48",
+            # ... other parameters (e.g., VPC ID, subnet IDs, security group IDs)
+        )
+        
+        print(response)
+        return 1
+        
+    except Exception as err:
+        vals = {"loc":["target_group","listner","task","ECS","launch_tmplate","asg"],"registry":event['data']["registry-name"]}
+        raise ValueError(json.dumps(vals))
 
 def lambda_handler(event, context):
     try:
@@ -107,7 +118,7 @@ def lambda_handler(event, context):
     except Exception as er:
         print("in error")
         print(str(er))
-    return {
-        'statusCode': 200,
-        'body': 1
-    }
+    
+    return event
+
+

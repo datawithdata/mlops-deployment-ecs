@@ -62,7 +62,6 @@ Resources:
                   - 'arn:aws:ec2:*:270932919550:security-group/*'
                   - 'arn:aws:ec2:*:270932919550:instance/*'
                   - 'arn:aws:ec2:*:270932919550:volume/*'
-                  - 'arn:aws:ec2:*::image/*'
                   - 'arn:aws:ec2:*:270932919550:subnet/*'
                   - 'arn:aws:ec2:*:270932919550:key-pair/*'
                 Resource: '*'

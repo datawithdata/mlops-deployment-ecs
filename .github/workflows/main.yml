@@ -24,4 +24,4 @@ jobs:
 
       - run: sam build --use-container
 
-      - run: sam deploy --stack-name ecs-automation --s3-bucket siri-git-actions --no-confirm-changeset --no-fail-on-empty-changeset 
+      - run: sam deploy --stack-name ecs-automation --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 

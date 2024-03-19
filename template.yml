@@ -74,7 +74,7 @@ Resources:
       Handler: list-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/list-registry
-      Role: IAMRoleForECSAutomation
+      Role: !GetAtt IAMRoleForECSAutomation
       Timeout: 90
   ModelRegistry:
     Type: AWS::Serverless::Function
@@ -83,9 +83,9 @@ Resources:
       Handler: model-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/model-registry
-      Role: IAMRoleForECSAutomation
+      Role: !GetAtt IAMRoleForECSAutomation
       Timeout: 90
 Outputs:
   MyLambdaArn:
     Description: ARN of the Lambda function
-    Value: IAMRoleForECSAutomation
+    Value: !GetAtt IAMRoleForECSAutomation

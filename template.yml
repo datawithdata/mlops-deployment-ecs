@@ -1,4 +1,5 @@
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
 Description: A SAM template for deploying a ECS Automaiton
 Resources:
   IAMRoleForECSAutomation:
@@ -6,7 +7,7 @@ Resources:
     Properties:
       RoleName: ecs-automation-role
       AssumeRolePolicyDocument:
-        Version: 2012-10-17
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -18,7 +19,7 @@ Resources:
       Policies:
         - PolicyName: ecs-policy
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -34,7 +35,7 @@ Resources:
                   - 'arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/net/*/*'
         - PolicyName: iam-ec2
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -49,7 +50,7 @@ Resources:
                 Resource: '*'
         - PolicyName: ec2-runinstance
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -65,28 +66,27 @@ Resources:
                   - 'arn:aws:ec2:*:270932919550:subnet/*'
                   - 'arn:aws:ec2:*:270932919550:key-pair/*'
                 Resource: '*'
-    Metadata:
-      SamResourceId: IAMRoleForECSAutomation
+
   ModelRegistryList:
-    Type: 'AWS::Lambda::Function'
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: list-model-registry
-      CodeUri: functions/list-registry
       Handler: list-registry.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/list-registry
       Role: !GetAtt 
         - IAMRoleForECSAutomation
         - Arn
-      Runtime: python3.9
       Timeout: 90
 
   ModelRegistry:
-    Type: 'AWS::Lambda::Function'
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: model-registry
-      CodeUri: functions/model-registry
       Handler: model-registry.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/model-registry
       Role: !GetAtt 
         - IAMRoleForECSAutomation
         - Arn
-      Runtime: python3.9
       Timeout: 90

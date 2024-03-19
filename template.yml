@@ -5,7 +5,7 @@ Resources:
   IAMRoleForECSAutomation:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ecs-automation-role
+      RoleName: 'ecs-automation-role'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -28,12 +28,12 @@ Resources:
                   - 'elasticloadbalancing:CreateRule'
                   - 'elasticloadbalancing:SetSubnets'
                 Resource:
-                  - arn:aws:elasticloadbalancing:*:270932919550:targetgroup/*/*
-                  - arn:aws:elasticloadbalancing:*:270932919550:listener/app/*/*/*
-                  - arn:aws:elasticloadbalancing:*:270932919550:listener/net/*/*/*
-                  - arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/app/*/*
-                  - arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/net/*/*
-        - PolicyName: iam-ec2
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:targetgroup/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:listener/app/*/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:listener/net/*/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/app/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/net/*/*'
+        - PolicyName: 'iam-ec2'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -48,7 +48,7 @@ Resources:
                   - 'iam:AddRoleToInstanceProfile'
                   - 'iam:TagInstanceProfile'
                 Resource: '*'
-        - PolicyName: ec2-runinstance
+        - PolicyName: 'ec2-runinstance'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -69,7 +69,7 @@ Resources:
   ModelRegistryList:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: list-model-registry
+      FunctionName: 'list-model-registry'
       Handler: list-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/list-registry
@@ -78,7 +78,7 @@ Resources:
   ModelRegistry:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: model-registry
+      FunctionName: 'model-registry'
       Handler: model-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/model-registry

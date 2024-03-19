@@ -90,7 +90,7 @@ Resources:
   createTargetListners:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: mlops-deploy-ecs-service
+      FunctionName: mlops-target-listners-lb
       Handler: target-groups.lambda_handler
       Runtime: python3.9
       CodeUri: functions/load-balancer
@@ -102,7 +102,7 @@ Resources:
   rollback:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: mlops-deploy-ecs-service
+      FunctionName: mlops-rollback
       Handler: rollback.lambda_handler
       Runtime: python3.9
       CodeUri: functions/Rollback

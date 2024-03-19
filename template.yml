@@ -78,7 +78,7 @@ Resources:
   createTaskCluster:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: mlops-deploy-ecs-service
+      FunctionName: mlops-create-ecs-task
       Handler: create-ecs-task.lambda_handler
       Runtime: python3.9
       CodeUri: functions/create-task-cluster

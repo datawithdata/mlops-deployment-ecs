@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: A SAM template for deploying a ECS Automaiton
+Description: A SAM template for deploying a ECS Automaiton 
 Resources:
   IAMRoleForECSAutomation:
     Type: 'AWS::IAM::Role'

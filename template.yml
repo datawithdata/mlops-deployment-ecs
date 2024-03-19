@@ -5,7 +5,7 @@ Resources:
   IAMRoleForECSAutomation:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: MyRole
+      RoleName: ecs-automation-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -15,57 +15,57 @@ Resources:
                 - ec2.amazonaws.com
                 - ecs-tasks.amazonaws.com
                 - lambda.amazonaws.com
-            Action: sts:AssumeRole
-        Policies:
-          - PolicyName: ecs-policy
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - elasticloadbalancing:CreateListener
-                    - elasticloadbalancing:CreateTargetGroup
-                    - elasticloadbalancing:CreateRule
-                    - elasticloadbalancing:SetSubnets
-                  Resource:
-                    - arn:aws:elasticloadbalancing:*:270932919550:targetgroup/*/*
-                    - arn:aws:elasticloadbalancing:*:270932919550:listener/app/*/*/*
-                    - arn:aws:elasticloadbalancing:*:270932919550:listener/net/*/*/*
-                    - arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/app/*/*
-                    - arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/net/*/*
-          - PolicyName: iam-ec2
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - iam:CreateInstanceProfile
-                    - iam:PassRole
-                    - iam:CreateServiceLinkedRole
-                    - iam:GetInstanceProfile
-                    - iam:UpdateRole
-                    - iam:ListInstanceProfiles
-                    - iam:AddRoleToInstanceProfile
-                    - iam:TagInstanceProfile
-                  Resource: "*"
-          - PolicyName: ec2-runinstance
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - arn:aws:ec2:*:270932919550:network-interface/*
-                    - arn:aws:elastic-inference:*:270932919550:elastic-inference-accelerator/*
-                    - arn:aws:ec2:*:270932919550:elastic-gpu/*
-                    - arn:aws:ec2:*:270932919550:launch-template/*
-                    - arn:aws:ec2:*:270932919550:capacity-reservation/*
-                    - arn:aws:ec2:*:270932919550:security-group/*
-                    - arn:aws:ec2:*:270932919550:instance/*
-                    - arn:aws:ec2:*:270932919550:volume/*
-                    - arn:aws:ec2:*::image/*
-                    - arn:aws:ec2:*:270932919550:subnet/*
-                    - arn:aws:ec2:*:270932919550:key-pair/*
-                  Resource: "*"   
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: ecs-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'elasticloadbalancing:CreateListener'
+                  - 'elasticloadbalancing:CreateTargetGroup'
+                  - 'elasticloadbalancing:CreateRule'
+                  - 'elasticloadbalancing:SetSubnets'
+                Resource:
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:targetgroup/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:listener/app/*/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:listener/net/*/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/app/*/*'
+                  - 'arn:aws:elasticloadbalancing:*:270932919550:loadbalancer/net/*/*'
+        - PolicyName: iam-ec2
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'iam:CreateInstanceProfile'
+                  - 'iam:PassRole'
+                  - 'iam:CreateServiceLinkedRole'
+                  - 'iam:GetInstanceProfile'
+                  - 'iam:UpdateRole'
+                  - 'iam:ListInstanceProfiles'
+                  - 'iam:AddRoleToInstanceProfile'
+                  - 'iam:TagInstanceProfile'
+                Resource: '*'
+        - PolicyName: ec2-runinstance
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'arn:aws:ec2:*:270932919550:network-interface/*'
+                  - 'arn:aws:elastic-inference:*:270932919550:elastic-inference-accelerator/*'
+                  - 'arn:aws:ec2:*:270932919550:elastic-gpu/*'
+                  - 'arn:aws:ec2:*:270932919550:launch-template/*'
+                  - 'arn:aws:ec2:*:270932919550:capacity-reservation/*'
+                  - 'arn:aws:ec2:*:270932919550:security-group/*'
+                  - 'arn:aws:ec2:*:270932919550:instance/*'
+                  - 'arn:aws:ec2:*:270932919550:volume/*'
+                  - 'arn:aws:ec2:*::image/*'
+                  - 'arn:aws:ec2:*:270932919550:subnet/*'
+                  - 'arn:aws:ec2:*:270932919550:key-pair/*'
+                Resource: '*'
 
   ModelRegistryList:
     Type: AWS::Serverless::Function

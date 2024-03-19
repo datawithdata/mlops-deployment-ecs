@@ -85,7 +85,4 @@ Resources:
       CodeUri: functions/model-registry
       Role: !GetAtt IAMRoleForECSAutomation.Arn
       Timeout: 90
-Outputs:
-  MyLambdaArn:
-    Description: ARN of the Lambda function
-    Value: !GetAtt IAMRoleForECSAutomation.Arn
+

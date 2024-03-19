@@ -26,7 +26,7 @@ Resources:
                 Resource: "*" 
 
 
-  ModelRegistryList:
+  modelRegistryList:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: list-model-registry
@@ -38,13 +38,74 @@ Resources:
         - Arn
       Timeout: 90
 
-  ModelRegistry:
+  modelRegistry:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: model-registry
       Handler: model-registry.lambda_handler
       Runtime: python3.9
       CodeUri: functions/model-registry
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+
+  createASG:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: create-ec2-asg
+      Handler: create-asg.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/create-auto-scaling-group
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+  
+
+  deployECS:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: deploy-ecs-service
+      Handler: create-ecs-service.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/create-ecs-service
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+  
+  createTaskCluster:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: deploy-ecs-service
+      Handler: create-ecs-task.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/create-task-cluster
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+
+  createTargetListners:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: deploy-ecs-service
+      Handler: target-groups.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/load-balancer
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+
+  rollback:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: deploy-ecs-service
+      Handler: rollback.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/Rollback
       Role: !GetAtt 
         - IAMRoleForECSAutomation
         - Arn

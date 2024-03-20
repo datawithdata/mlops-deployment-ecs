@@ -8,7 +8,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${create-target-listner.Arn}"
+        "FunctionName": "${create-target-listner}"
       },
       "Retry": [
         {

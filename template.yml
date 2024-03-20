@@ -111,15 +111,17 @@ Resources:
         - Arn
       Timeout: 90
 
-  MyStateMachine:
-    Type: AWS::StepFunctions::StateMachine
+  ecsAutomationStateMachine:
+    Type: AWS::Serverless::StateMachine
     Properties:
-      - DefinitionUri: stepfunctions/ecs-automation.asl.json
-      - create-target-listner: !GetAtt createTargetListners.Arn
-      - rollback: !GetAtt rollback.Arn
-      - create-ecs-clusters: !GetAtt createTaskCluster.Arn
-      - create-auto-scaling: !GetAtt createASG.Arn
-      - deploy-ecs-task: !GetAtt deployECS.Arn
-      RoleArn: !GetAtt 
+       Name: ecs-automation-statemachine
+       DefinitionUri: stepfunctions/ecs-automation.asl.json
+       DefinitionSubstitutions:
+          create-target-listner: !GetAtt createTargetListners.Arn
+          rollback: !GetAtt rollback.Arn
+          create-ecs-clusters: !GetAtt createTaskCluster.Arn
+          create-auto-scaling: !GetAtt createASG.Arn
+          deploy-ecs-task: !GetAtt deployECS.Arn
+       Role: !GetAtt 
             - IAMRoleForECSAutomation
             - Arn

@@ -16,6 +16,12 @@ jobs:
         with:
             role-to-assume: arn:aws:iam::270932919550:role/git-actions-iam 
             aws-region: us-east-1
+     
+      - name: Read param file
+        run:|
+          PARAMS_FILE=dev.json
+          PARAMETER_OVERRIDES=$(jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' "$PARAMS_FILE")
+          echo PARAMETER_OVERRIDES
 
       - name: Install SAM CLI
         run: curl -sL https://raw.githubusercontent.com/aws/aws-cli/v2/dist/aws/install | bash

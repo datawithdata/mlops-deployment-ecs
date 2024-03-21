@@ -12,7 +12,7 @@ Parameters:
     Type: String
     Description: VPC ID for Load Balancer and ASG
   subnets:
-    Type: CommaDelimitedList
+    Type: String
     Description: subnets for Load Balancer and ASG
   x86:
     Type: String
@@ -211,7 +211,9 @@ Resources:
       Type: application
       Scheme: internet-facing
       SecurityGroups: [!Ref albSecurituGroup]
-      Subnets: !Ref subnets
+      Subnets: !Split
+        - ","
+        - !Ref subnets
 
   mlopsS3Bucket:
     Type: AWS::S3::Bucket

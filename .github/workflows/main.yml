@@ -26,7 +26,12 @@ jobs:
             role-to-assume: arn:aws:iam::270932919550:role/git-actions-iam 
             aws-region: us-east-1
       
+      - name: Read parameters from JSON file
+        id: read_params
+        run: |
+          echo ::set-output name=params::$(cat dev.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')
+
 
       - run: sam build --use-container
 
-      - run: sam deploy --stack-name ecs-automation --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 
+      - run: sam deploy --stack-name ecs-automation --parameter-overrides ${{ steps.read_params.outputs.params }} --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 

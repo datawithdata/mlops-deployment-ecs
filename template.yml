@@ -56,7 +56,6 @@ Resources:
   
   IAMRoleForECSAutomation:
     Type: AWS::IAM::Role
-    
     Properties:
       RoleName: mlops-ecs-automation
       AssumeRolePolicyDocument:
@@ -291,7 +290,7 @@ Resources:
         Variables:
           AMI_ARM: !Ref arm
           AMI_x86: !Ref x86
-          ARN: !GetAtt mlopsInstanceProfile.Arn
+          ARN: !GetAtt instanceRole.Arn
           bool: True
   
 

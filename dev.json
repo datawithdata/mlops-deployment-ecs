@@ -4,6 +4,7 @@
     "vpc":"vpc-0b4da02d066d1e2af",
     "subnets": 123,
     "x86": 123,
-    "arm":123
+    "arm":123,
+    "mlopsS3BucketName":"mlops-model-registry-270932919550"
 
 }

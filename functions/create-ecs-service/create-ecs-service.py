@@ -10,8 +10,9 @@ def deploy_service(event):
     desired_count = 1  # Number of tasks to run
 
     # Define service configuration
+    print("mlops-"+event['data']["registry-name"])
     service_config = {
-        'cluster': event['data']["registry-name"],
+        'cluster': "mlops-"+event['data']["registry-name"],
         'serviceName': event['data']["registry-name"]+"-service",
         'taskDefinition': event['taskDefinitionArn'],
         'desiredCount': desired_count,
@@ -35,6 +36,7 @@ def deploy_service(event):
         # Create the ECS service
         response = ecs_client.create_service(**service_config)
     except Exception as err:
+        print(str(err))
         vals = {"loc":["target_group","listner","task","ECS","launch_tmplate","service"],"registry":event['data']["registry-name"]}
         raise ValueError(json.dumps(vals))
 

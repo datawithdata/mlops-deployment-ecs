@@ -1,0 +1,36 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"elasticloadbalancing:RegisterTargets",
+				"elasticloadbalancing:CreateTargetGroup",
+				"elasticloadbalancing:ModifyTargetGroup"
+			],
+			"Resource": "arn:aws:elasticloadbalancing:us-east-1:270932919550:targetgroup/*/*"
+		},
+		{
+			"Sid": "VisualEditor1",
+			"Effect": "Allow",
+			"Action": [
+				"elasticloadbalancing:CreateListener",
+				"elasticloadbalancing:DescribeListeners",
+				"elasticloadbalancing:AddTags",
+				"elasticloadbalancing:DescribeTargetGroups"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "VisualEditor2",
+			"Effect": "Allow",
+			"Action": [
+				"elasticloadbalancing:RegisterTargets",
+				"elasticloadbalancing:CreateTargetGroup",
+				"elasticloadbalancing:ModifyTargetGroup"
+			],
+			"Resource": "arn:aws:elasticloadbalancing:us-east-1:270932919550:targetgroup/*/*"
+		}
+	]
+}

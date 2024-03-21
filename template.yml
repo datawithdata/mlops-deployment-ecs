@@ -1,10 +1,158 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: SAM template for deploying ECS Automation framework
 Transform: AWS::Serverless-2016-10-31
+Parameters:
+  accountid:
+    Type: String
+    Description: AWS Account ID for dev, qa, Prod 
+  region:
+    Type: String
+    Description: AWS Region where code need to be deployed
+  vpc:
+    Type: String
+    Description: VPC ID for Load Balancer and ASG
+  subnets:
+    Type: CommaDelimitedList
+    Description: subnets for Load Balancer and ASG
+  x86:
+    Type: String
+    Description: EC2 AMI ID for X86 processor 
+  arm: 
+    Type: String  
+    Description: EC2 AMI ID for ARM processor 
+  mlopsS3BucketName:
+    Type: String  
+    Description: S3 bucket for storing model artifcats 
+
 Resources:
-  IAMRoleForECSAutomation:
+
+  mlopsOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      ClientIdList:
+        - YOUR_OIDC_CLIENT_ID
+      ThumbprintList:
+        - 1b511abead59c6ce207077c0bf0e0043b1382612
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+      Url: token.actions.githubusercontent.com
+
+
+  mlopsOIDCRole:
     Type: AWS::IAM::Role
     Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: "Allow"
+            Principal: 
+              Federated: !Sub "arn:aws:iam::${accountid}:oidc-provider/token.actions.githubusercontent.com"
+            Action: "sts:AssumeRoleWithWebIdentity"
+            Condition: 
+              StringEquals: 
+                token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
+              StringLike: 
+                token.actions.githubusercontent.com:sub: "repo:datawithdata/*"
+      Policies:
+        - PolicyName: git-dynamodb
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: 
+            - Sid: "VisualEditor0"
+              Effect: "Allow"
+              Action: 
+                - "dynamodb:GetItem"
+                - "dynamodb:UpdateItem"
+                - "dynamodb:GetRecords"
+              Resource: 
+                - !GetAtt mlopsDynamoDB.Arn
+          
+        - PolicyName: git-s3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: 
+            - Sid: "VisualEditor0"
+              Effect: "Allow"
+              Action: 
+                - "s3:GetObjectAcl"
+                - "s3:GetObject"
+                - "s3:ListAccessGrants"
+                - "s3:ListBucketVersions"
+                - "s3:GetObjectAttributes"
+                - "s3:ListBucket"
+              Resource: !Ref mlopsS3Bucket
+            - Sid: "VisualEditor1"
+              Effect: "Allow"
+              Action: 
+                - "s3:ListAllMyBuckets"
+                - "s3:ListJobs"
+              Resource: "*"
+
+        
+        - PolicyName: git-ecr
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: 
+            - Sid: "VisualEditor0"
+              Effect: "Allow"
+              Action: 
+                - "ecr:DescribeRepositoryCreationTemplate"
+                - "ecr:GetRegistryPolicy"
+                - "ecr:PutLifecyclePolicy"
+                - "ecr:PutImageTagMutability"
+                - "ecr:DescribeImageScanFindings"
+                - "ecr:CreateRepository"
+                - "ecr:DescribeRegistry"
+                - "ecr:PutImageScanningConfiguration"
+                - "ecr:DescribeImageReplicationStatus"
+                - "ecr:GetAuthorizationToken"
+                - "ecr:UploadLayerPart"
+                - "ecr:PutRegistryScanningConfiguration"
+                - "ecr:ListImages"
+                - "ecr:PutImage"
+                - "ecr:CreateRepositoryCreationTemplate"
+                - "ecr:BatchGetImage"
+                - "ecr:CompleteLayerUpload"
+                - "ecr:DescribeImages"
+                - "ecr:TagResource"
+                - "ecr:DescribeRepositories"
+                - "ecr:InitiateLayerUpload"
+                - "ecr:BatchCheckLayerAvailability"
+                - "ecr:ReplicateImage"
+              Resource: "*"
+        
+
+  mlopsInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref instanceRole
+
+  instanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: MyPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 's3:GetObject'
+                Resource: '*'
+  
+  IAMRoleForECSAutomation:
+    Type: AWS::IAM::Role
+    
+    Properties:
+      RoleName: mlops-ecs-automation
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -15,16 +163,183 @@ Resources:
             Action:
               - sts:AssumeRole
       Policies:
-        - PolicyName: MyPolicy  
+        - PolicyName: mlops-dynamodb  
           PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow  
-                Action:
-                  - s3:GetObject  
-                  - s3:PutObject  
-                Resource: "*" 
+           Version: '2012-10-17'
+           Statement:
+            - Effect: Allow
+              Action: 'dynamodb:GetItem'
+              Resource: !Sub 'arn:aws:dynamodb:${region}:${accountid}:table/siri-*'
 
+        - PolicyName: mlops-ec2  
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:DescribeLaunchTemplates'
+                  - 'ec2:DescribeTags'
+                  - 'ec2:CreateTags'
+                  - 'ec2:DescribeLaunchTemplateVersions'
+                  - 'ec2:RunInstances'
+                  - 'ssm:GetParameters'
+                  - 'ec2:DescribeSecurityGroups'
+                  - 'ec2:CreateLaunchTemplateVersion'
+                  - 'ec2:GetLaunchTemplateData'
+                  - 'ec2:CreateLaunchTemplate'
+                  - 'ec2:DescribeInstanceTypeOfferings'
+                  - 'ec2:DescribeInstanceTypes'
+                  - 'ec2:DescribeSubnets'
+                  - 'autoscaling:CreateAutoScalingGroup'
+                  - 'autoscaling:UpdateAutoScalingGroup'
+                  - 'ec2:DescribeInstanceStatus'
+                  - 'autoscaling:DescribeAutoScalingGroups'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'iam:PassRole'
+                  - 'iam:CreateServiceLinkedRole'
+                Resource: '*'
+
+        - PolicyName: mlops-ecr 
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ecr:GetDownloadUrlForLayer'
+                  - 'ecr:BatchGetImage'
+                  - 'ecr:BatchCheckLayerAvailability'
+                Resource: 'arn:aws:ecr:${region}:${accountid}:repository/*'
+              - Effect: Allow
+                Action: 'ecr:GetAuthorizationToken'
+                Resource: '*'
+
+        - PolicyName: mlops-ecs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ecs:CreateCluster'
+                  - 'ecs:TagResource'
+                  - 'ecs:ListClusters'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'ecs:RegisterTaskDefinition'
+                  - 'logs:CreateLogGroup'
+                Resource:
+                  - 'arn:aws:ecs:${region}:${accountid}:task-definition/mlops-*:*'
+                  - 'arn:aws:logs:${region}:${accountid}:log-group:mlops-*'
+              - Effect: Allow
+                Action: 'iam:PassRole'
+                Resource: '*'
+              - Effect: Allow
+                Action: 'ecs:CreateService'
+                Resource: '*'
+              - Effect: Allow
+                Action: 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:${region}:${accountid}:log-group:mlops-*:log-stream:mlops-*'
+
+        - PolicyName: mlops-elb 
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'elasticloadbalancing:RegisterTargets'
+                  - 'elasticloadbalancing:CreateTargetGroup'
+                  - 'elasticloadbalancing:ModifyTargetGroup'
+                Resource: 'arn:aws:elasticloadbalancing:${region}:${accountid}:targetgroup/*/*'
+              - Effect: Allow
+                Action:
+                  - 'elasticloadbalancing:CreateListener'
+                  - 'elasticloadbalancing:DescribeListeners'
+                  - 'elasticloadbalancing:AddTags'
+                  - 'elasticloadbalancing:DescribeTargetGroups'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'elasticloadbalancing:RegisterTargets'
+                  - 'elasticloadbalancing:CreateTargetGroup'
+                  - 'elasticloadbalancing:ModifyTargetGroup'
+                Resource: 'arn:aws:elasticloadbalancing:${region}:${accountid}:targetgroup/*/*'
+
+
+        - PolicyName: mlops-lambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunctionUrl'
+                  - 'lambda:InvokeFunction'
+                Resource: 'arn:aws:lambda:${region}:${accountid}:function:mlops-*'
+              - Effect: Allow
+                Action: 'logs:CreateLogGroup'
+                Resource: 'arn:aws:logs:${region}:${accountid}:*'
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+
+
+  albSecurituGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref vpc
+      GroupDescription: My security group description
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 6000
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+
+  mlopsLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internet-facing
+      SecurityGroups: [!Ref albSecurituGroup]
+      Subnets: !Ref subnets
+
+  mlopsS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref mlopsS3BucketName
+      AccessControl: Private
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+            AllowedHeaders:
+              - '*'
+
+
+  mlopsDynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: mlops-model-registry
+      AttributeDefinitions:
+        - AttributeName: registry-name
+          AttributeType: S
+        # Add more attribute definitions as needed
+      KeySchema:
+        - AttributeName: registry-name
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
   modelRegistryList:
     Type: AWS::Serverless::Function
@@ -61,6 +376,12 @@ Resources:
         - IAMRoleForECSAutomation
         - Arn
       Timeout: 90
+      Environment:
+        Variables:
+          AMI_ARM: !Ref arm
+          AMI_x86: !Ref x86
+          ARN: !Ref mlopsInstanceProfile
+          bool: True
   
 
   deployECS:
@@ -98,6 +419,10 @@ Resources:
         - IAMRoleForECSAutomation
         - Arn
       Timeout: 90
+      Environment:
+        Variables:
+          LOADBALANCER_ARN: !Ref mlopsLoadBalancer
+          TABLE_NAME: !Ref mlopsDynamoDB
 
   rollback:
     Type: AWS::Serverless::Function

@@ -1,0 +1,9 @@
+{
+    "accountid":270932919550,
+    "region": "us-east-1",
+    "vpc":"vpc-0b4da02d066d1e2af",
+    "subnets": 123,
+    "x86": 123,
+    "arm":123
+
+}

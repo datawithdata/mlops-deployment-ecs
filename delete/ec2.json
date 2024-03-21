@@ -1,0 +1,54 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"ec2:RunInstances"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "VisualEditor1",
+			"Effect": "Allow",
+			"Action": [
+				"autoscaling:CreateAutoScalingGroup"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "VisualEditor5",
+			"Effect": "Allow",
+			"Action": [
+				"ec2:CreateLaunchTemplate",
+				"ec2:CreateLaunchTemplateVersion"
+			],
+			"Resource": "arn:aws:ec2:*:270932919550:launch-template/*"
+		},
+		{
+			"Sid": "VisualEditor2",
+			"Effect": "Allow",
+			"Action": [
+				"ec2:DescribeLaunchTemplates",
+				"ec2:DescribeTags",
+				"ec2:DescribeInstanceTypes",
+				"ec2:DescribeInstanceStatus",
+				"ec2:DescribeSecurityGroups",
+				"ec2:DescribeSubnets",
+				"ec2:DescribeInstanceTypeOfferings",
+				"ec2:CreateTags"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "VisualEditor3",
+			"Effect": "Allow",
+			"Action": [
+				"iam:PassRole",
+				"iam:CreateServiceLinkedRole"
+			],
+			"Resource": "arn:aws:iam::270932919550:instance-profile/ec2"
+		}
+	]
+}

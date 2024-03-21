@@ -2,7 +2,10 @@ name: Deploy Lambda
 
 on:
   push:
-    branches: [ main ]  # Change branch name to trigger deployment on push
+    branches: 
+      - dev
+      - qa
+      - prod
 
 jobs:
   build-and-deploy:

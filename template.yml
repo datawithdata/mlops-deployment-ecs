@@ -29,12 +29,14 @@ Resources:
   mlopsInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
+      InstanceProfileName: ec2-instance-role
       Roles:
         - !Ref instanceRole
 
   instanceRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: ecs-ec2-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -63,7 +65,10 @@ Resources:
           - Effect: Allow
             Principal:
               Service:
-                - lambda.amazonaws.com  
+                - lambda.amazonaws.com
+                - ec2.amazonaws.com
+                - ecr.amazonaws.com
+                - ecs-tasks.amazonaws.com  
             Action:
               - sts:AssumeRole
       Policies:
@@ -286,7 +291,7 @@ Resources:
         Variables:
           AMI_ARM: !Ref arm
           AMI_x86: !Ref x86
-          ARN: !Ref mlopsInstanceProfile
+          ARN: !GetAtt mlopsInstanceProfile.Arn
           bool: True
   
 

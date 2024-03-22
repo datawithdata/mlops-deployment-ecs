@@ -17,7 +17,7 @@ dynamodb = boto3.resource('dynamodb')
 
 def update_dynamodb(contents):
     # Get a reference to the table
-    table_name = "siri-model-registry"
+    table_name = os.environ['TABLE_NAME']
     table = dynamodb.Table(table_name)
     try:
         # Check if record exists
@@ -26,22 +26,18 @@ def update_dynamodb(contents):
 
         print("update existing registry")
         for version in response['Item']['versions']:
-            if version['version'] == contents['model-version']: #earlier its ecr-version 
+            if version['version'] == contents['model-version']:
+                matching_dicts = list(filter(lambda item: item["version"] == contents['ecr-version'], version['ECR-info']))
                 print(version)
-                if version.get('ECR-info'):
-                    print("update")
-                    version['ECR-info'].append(
-                        {"version": os.environ['new_version'], "ecr-name": sys.argv[1]})
-                    version["config"].append(
-                        {"config": {"ram": contents['ram'], "cpu": contents['cpu'], "version": os.environ['new_version']}})
+                if matching_dicts:
+                    matching_dict = matching_dicts[0]  # First matching dictionary
+                    matching_dict["listner_arn"] = contents['listner_arn']  
+                    matching_dict["target_group_arn"] = contents['target_group_arn']  
+                    matching_dict['taskDefinitionArn'] = contents['taskDefinitionArn']
+                    matching_dict['predict-url'] = contents['loadbalancer_dns']+":"+contents['port']
                 else:
-                    print("New record")
-                    version["ECR-info"] = []
-                    version["ECR-info"].append({"version": os.environ['new_version'],
-                                               "ecr-name": sys.argv[1]})
-                    version["config"] = []
-                    version["config"].append(
-                        {"config": {"ram": contents['ram'], "cpu": contents['cpu'], "version": os.environ['new_version']}})
+                    print("No dictionary with value of 'a' equal to 1 found.")
+                
         response = table.update_item(
             Key={"registry-name": contents['registry-name']},
             UpdateExpression='SET versions = :versions',
@@ -53,13 +49,10 @@ def update_dynamodb(contents):
         print(str(err))
 
 
-def lambda_handler():
+def lambda_handler(event, context):
     # TODO implement
     # Replace these with your actual values
-    file_path = "config.json"
-    with open(file_path, "r") as file:
-        contents = json.loads(file.read())
-    _ = update_dynamodb(contents)
+    _ = update_dynamodb(event)
 
     return {
         'statusCode': 200,

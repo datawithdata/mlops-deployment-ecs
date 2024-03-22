@@ -16,13 +16,14 @@ def get_instance_id(event):
     
             Filters=[
                 {"Name": "memory-info.size-in-mib",
-                 "Values": [event['data']['ram'], str(int(event['data']['ram'])+1)]},
+                 "Values": [event['data']['ram'], str(int(event['data']['ram']))]},
                 {"Name": "vcpu-info.default-vcpus",
-                 "Values": [event['data']['cpu'], str(int(event['data']['cpu'])+1)]}
+                 "Values": [event['data']['cpu'], str(int(event['data']['cpu']))]}
             ],
             MaxResults=100,
         )
-        
+        print("in hereeeeeeee")
+        print(response)
         instance_id=""
         for instance_ids in response['InstanceTypes']:
             print("In loops")
@@ -43,6 +44,7 @@ def get_instance_id(event):
         print(instance_id)
         return [instance_id,ami_id]
     except Exception as err:
+        print(str(err))
         vals = {"loc":["target_group","listner","task","ECS"]}
         raise ValueError(json.dumps(vals))
 
@@ -51,7 +53,7 @@ def create_launch_template(event):
         # Define parameters
         userData=f"""#!/bin/bash
     
-    echo ECS_CLUSTER={event['data']["registry-name"]} >> /etc/ecs/ecs.config""".encode("us-ascii")
+    echo ECS_CLUSTER={"mlops-"+event['data']["registry-name"]} >> /etc/ecs/ecs.config""".encode("us-ascii")
         template_name = event['data']["registry-name"]
         instance_info = get_instance_id(event)
         instance_type = instance_info[0] #"t3.micro"
@@ -86,6 +88,7 @@ def create_launch_template(event):
         return response['LaunchTemplate']['LaunchTemplateName']
     
     except Exception as err:
+        print(str(err))
         vals = {"loc":["target_group","listner","task","ECS","launch_tmplate"],"registry":event['data']["registry-name"]}
         raise ValueError(json.dumps(vals))
 
@@ -93,7 +96,7 @@ def create_asg(event):
     try:
         launch_template_name = create_launch_template(event)
         response = client_asg.create_auto_scaling_group(
-            AutoScalingGroupName=event['data']["registry-name"],
+            AutoScalingGroupName="mlops-"+event['data']["registry-name"],
             LaunchTemplate={
                 "LaunchTemplateName": launch_template_name,
                 "Version": "$Latest",  # Use the latest version of the Launch Template

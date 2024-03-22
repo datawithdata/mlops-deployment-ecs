@@ -86,6 +86,7 @@ Resources:
                 - ec2.amazonaws.com
                 - ecr.amazonaws.com
                 - ecs-tasks.amazonaws.com  
+                - states.amazonaws.com
             Action:
               - sts:AssumeRole
       Policies:
@@ -308,8 +309,8 @@ Resources:
         Variables:
           AMI_ARM: !Ref arm
           AMI_x86: !Ref x86
-          ARN: !GetAtt instanceRole.Arn
-          bool: True
+          ARN: !GetAtt mlopsInstanceProfile.Arn
+          bool: "True"
   
 
   deployECS:
@@ -350,6 +351,22 @@ Resources:
       Environment:
         Variables:
           LOADBALANCER_ARN: !Ref mlopsLoadBalancer
+          TABLE_NAME: !Ref mlopsDynamoDB
+
+  updateDynamoSuccess:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mlops-update-dynamo-success
+      Handler: updte-dynamo.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/dynamo-db-success
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+      Environment:
+        Variables:
+          LOADBALANCER_ARN: !GetAtt mlopsLoadBalancer.DNSName
           TABLE_NAME: !Ref mlopsDynamoDB
 
   rollback:

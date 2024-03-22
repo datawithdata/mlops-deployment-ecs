@@ -22,6 +22,16 @@ dynamodb = boto3.resource('dynamodb')
         print(str(err))
     return 1"""
 
+def get_avilable_ports():
+    response = client.describe_listeners(LoadBalancerArn=os.environ['LOADBALANCER_ARN'])
+    ports=[]
+    for port in s['Listeners']:
+        ports.append(port['Port'])
+    if len(ports) == 0:
+        return 5001
+    else:
+        ports.sort()
+        return ports[-1]+1
 
 def create_target_group(event):
     try:
@@ -53,12 +63,12 @@ def create_target_group(event):
     
 
 
-def create_listner(event, target_group_arn):
+def create_listner(event, target_group_arn,list_port):
     try:
         response = client.create_listener(
             LoadBalancerArn=os.environ['LOADBALANCER_ARN'],
             Protocol='HTTP',
-            Port=5001,
+            Port=list_port,
             DefaultActions=[
                 {
                     'Type': 'forward',
@@ -87,16 +97,17 @@ def create_listner(event, target_group_arn):
         return response['Listeners'][0]['ListenerArn']
     
     except Exception as err:
-        vals = {"loc":["target_group","listner"],"target_group_arn",target_group_arn}
+        print(str(err))
+        vals = {"loc":["target_group","listner"],"target_group_arn":target_group_arn}
         raise ValueError(json.dumps(vals))
 
 
 def lambda_handler(event, context):
     # TODO implement
     # Replace these with your actual values
-
+    list_port=get_avilable_ports()
     target_group_arn = create_target_group(event)
-    listner_arn = create_listner(event, target_group_arn)
-
+    listner_arn = create_listner(event, target_group_arn,list_port)
+    event['port'] = list_port
     return {"target_group_arn": target_group_arn, "listner_arn": listner_arn,"data":event}
    

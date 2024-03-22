@@ -55,7 +55,7 @@ def create_launch_template(event):
         template_name = event['data']["registry-name"]
         instance_info = get_instance_id(event)
         instance_type = instance_info[0] #"t3.micro"
-        image_id = "ami-0e5462b0cdd5ced35"#instance_info[1]
+        image_id = instance_info[1]  #"ami-0e5462b0cdd5ced35"
     
         # Create Launch Template
         print("creating")

@@ -95,8 +95,10 @@ Resources:
            Version: '2012-10-17'
            Statement:
             - Effect: Allow
-              Action: 'dynamodb:GetItem'
-              Resource: !Sub 'arn:aws:dynamodb:${region}:${accountid}:table/siri-*'
+              Action: 
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+              Resource: !Sub 'arn:aws:dynamodb:${region}:${accountid}:table/mlops-*'
 
         - PolicyName: mlops-ec2  
           PolicyDocument:
@@ -366,7 +368,7 @@ Resources:
       Timeout: 90
       Environment:
         Variables:
-          LOADBALANCER_ARN: !GetAtt mlopsLoadBalancer.DNSName
+          LOADBALANCER_NAME: !GetAtt mlopsLoadBalancer.DNSName
           TABLE_NAME: !Ref mlopsDynamoDB
 
   rollback:

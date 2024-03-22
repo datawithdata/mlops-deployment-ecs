@@ -42,10 +42,10 @@ def register_task(event):
             version = event['data']['ecr-version']
         # Define your task definition details
         task_definition = {
-            "family": event['data']['registry-name'],
+            "family": "mlops-"+event['data']['registry-name'],
             "cpu": str(int(float(event['data']['cpu'])*1024)),
             "executionRoleArn":"arn:aws:iam::270932919550:role/ECS-auto-deployment",
-            "memory": event['data']['ram'],
+            "memory": str(int(event['data']['ram'])-512), 
             "networkMode": "awsvpc",
             "requiresCompatibilities": ["EC2"],
             "containerDefinitions": [
@@ -61,7 +61,7 @@ def register_task(event):
                         }
                     ],
                     "cpu": int(float(event['data']['cpu'])*1024), 
-                    "memory": int(event['data']['ram'])
+                    "memory": int(event['data']['ram'])-512
                 }
             ]
         }
@@ -70,6 +70,7 @@ def register_task(event):
         return response['taskDefinition']['taskDefinitionArn']
     
     except Exception as err:
+        print(str(err))
         vals = {"loc":["target_group","listner","task"]}
         raise ValueError(json.dumps(vals))
 
@@ -77,7 +78,7 @@ def register_task(event):
 def create_cluster(event):
     try:
         response = client.create_cluster(
-            clusterName=event['data']['registry-name'],
+            clusterName="mlops-"+event['data']['registry-name'],
             tags=[
                 {
                     'key': 'string',
@@ -103,6 +104,7 @@ def create_cluster(event):
         )
         return 1
     except Exception as err:
+        print(str(err))
         vals = {"loc":["target_group","listner","task","ECS"]}
         raise ValueError(json.dumps(vals))
 

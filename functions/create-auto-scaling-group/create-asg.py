@@ -54,15 +54,15 @@ def create_launch_template(event):
     echo ECS_CLUSTER={event['data']["registry-name"]} >> /etc/ecs/ecs.config""".encode("us-ascii")
         template_name = event['data']["registry-name"]
         instance_info = get_instance_id(event)
-        instance_type = "t3.micro"#instance_info[0]
-        image_id = "ami-0e5462b0cdd5ced35"#instance_info[1]
+        instance_type = instance_info[0] #"t3.micro"
+        image_id = instance_info[1]  #"ami-0e5462b0cdd5ced35"
     
         # Create Launch Template
         print("creating")
         response = ec2_client.create_launch_template(
             DryRun=False,
             LaunchTemplateName=template_name,
-            VersionDescription="Model deploymetn",
+            VersionDescription="Model deployment",
             LaunchTemplateData={
                 'EbsOptimized': False,
                 'IamInstanceProfile': {

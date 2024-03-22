@@ -46,13 +46,31 @@ Resources:
             Action: sts:AssumeRole
       Path: /
       Policies:
-        - PolicyName: MyPolicy
+        - PolicyName: mlops-ecs-ec2
           PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: 's3:GetObject'
-                Resource: '*'
+            Version: "2012-10-17"
+            Statement: 
+            - Effect: "Allow"
+              Action: 
+              - "ssm:StartSession"
+              - "ec2:DescribeInstances"
+              Resource: "*"
+            - Effect: "Allow"
+              Action: 
+              - "ecs:CreateCluster"
+              - "ecs:DeregisterContainerInstance"
+              - "ecs:DiscoverPollEndpoint"
+              - "ecs:Poll"
+              - "ecs:RegisterContainerInstance"
+              - "ecs:StartTelemetrySession"
+              - "ecs:Submit*"
+              - "ecr:GetAuthorizationToken"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              Resource: "*"
   
   IAMRoleForECSAutomation:
     Type: AWS::IAM::Role

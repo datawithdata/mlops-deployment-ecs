@@ -394,6 +394,7 @@ Resources:
           create-ecs-clusters: !GetAtt createTaskCluster.Arn
           create-auto-scaling: !GetAtt createASG.Arn
           deploy-ecs-task: !GetAtt deployECS.Arn
+          mlops-update-dynamo-success: !GetAtt updateDynamoSuccess.Arn
        Role: !GetAtt 
             - IAMRoleForECSAutomation
             - Arn

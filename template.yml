@@ -404,7 +404,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: mlops-update-dynamo-success
-      Handler: updte-dynamo.lambda_handler
+      Handler: update-dynamo.lambda_handler
       Runtime: python3.9
       CodeUri: functions/dynamo-db-success
       Role: !GetAtt 
@@ -443,6 +443,21 @@ Resources:
         Variables:
           TABLE_NAME: !Ref mlopsDynamoDB
 
+  sendEmail:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mlops-send-email
+      Handler: send-email.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/send-success-email
+      Role: !GetAtt 
+        - IAMRoleForECSdelete
+        - Arn
+      Timeout: 90
+      Environment:
+        Variables:
+          LOADBALANCER_NAME: !GetAtt mlopsLoadBalancer.DNSName
+
   ecsAutomationStateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
@@ -455,6 +470,7 @@ Resources:
           create-auto-scaling: !GetAtt createASG.Arn
           deploy-ecs-task: !GetAtt deployECS.Arn
           mlops-update-dynamo-success: !GetAtt updateDynamoSuccess.Arn
+          send-success-email: !GetAtt sendEmail.Arn
        Role: !GetAtt 
             - IAMRoleForECSAutomation
             - Arn

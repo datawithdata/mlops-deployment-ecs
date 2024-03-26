@@ -59,8 +59,8 @@ def create_launch_template(event):
         #instance_info = get_instance_id(event)
         #instance_type = instance_info[0] #"t3.micro"
         #image_id = instance_info[1]  #"ami-0e5462b0cdd5ced35"
-        instance_type = event['instance_type']
-        image_id = os.environ['AMI-ID']
+        instance_type = event['data']['instance_type']
+        image_id = os.environ['AMI_ID']
         # Create Launch Template
         print("creating")
         response = ec2_client.create_launch_template(

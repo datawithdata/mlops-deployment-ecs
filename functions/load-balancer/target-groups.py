@@ -25,7 +25,7 @@ dynamodb = boto3.resource('dynamodb')
 def get_avilable_ports():
     response = client.describe_listeners(LoadBalancerArn=os.environ['LOADBALANCER_ARN'])
     ports=[]
-    for port in s['Listeners']:
+    for port in response['Listeners']:
         ports.append(port['Port'])
     if len(ports) == 0:
         return 5001

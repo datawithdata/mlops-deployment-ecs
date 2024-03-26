@@ -38,7 +38,7 @@ def update_dynamodb(contents):
                     matching_dict["listner_arn"] = contents['listner_arn']  
                     matching_dict["target_group_arn"] = contents['target_group_arn']  
                     matching_dict['taskDefinitionArn'] = contents['taskDefinitionArn']
-                    matching_dict['predict-url'] = os.environ['LOADBALANCER_NAME']+":"+str(contents['port'])
+                    matching_dict['predict-url'] = os.environ['LOADBALANCER_NAME']+":"+str(contents['data']['port'])
                 else:
                     print("No dictionary match")
                     return "no data"
@@ -65,5 +65,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('Successfully update')
     }
-
-

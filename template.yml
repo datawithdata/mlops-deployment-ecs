@@ -20,6 +20,9 @@ Parameters:
   arm: 
     Type: String  
     Description: EC2 AMI ID for ARM processor 
+  imageID:
+    Type: String
+    Description: EC2 Image id
   mlopsS3BucketName:
     Type: String  
     Description: S3 bucket for storing model artifcats 
@@ -72,6 +75,47 @@ Resources:
               - "logs:PutLogEvents"
               Resource: "*"
   
+  IAMRoleForECSdelete:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: mlops-delete-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: mlops-delete
+          PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:DeleteLaunchTemplate
+            - dynamodb:GetItem
+            - ecs:DeleteService
+            - dynamodb:UpdateItem
+            - autoscaling:DeleteAutoScalingGroup
+            - ec2:DeleteLaunchTemplateVersions
+            Resource:
+            - arn:aws:ecs:*:270932919550:service/mlops-*/*
+            - arn:aws:dynamodb:*:270932919550:table/mlops-*
+            - arn:aws:autoscaling:*:270932919550:autoScalingGroup:*:autoScalingGroupName/mlops-*
+            - arn:aws:ec2:*:270932919550:launch-template/*
+          - Effect: Allow
+            Action:
+            - elasticloadbalancing:DescribeLoadBalancerAttributes
+            - elasticloadbalancing:DescribeLoadBalancers
+            - elasticloadbalancing:DescribeListeners
+            - elasticloadbalancing:DeleteTargetGroup
+            - elasticloadbalancing:DeleteRule
+            - elasticloadbalancing:DeleteListener
+            Resource: "*"
+
+
   IAMRoleForECSAutomation:
     Type: AWS::IAM::Role
     Properties:
@@ -313,6 +357,7 @@ Resources:
           AMI_x86: !Ref x86
           ARN: !GetAtt mlopsInstanceProfile.Arn
           bool: "True"
+          AMI_ID: !Ref imageID
   
 
   deployECS:
@@ -338,6 +383,9 @@ Resources:
         - IAMRoleForECSAutomation
         - Arn
       Timeout: 90
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref mlopsDynamoDB
 
   createTargetListners:
     Type: AWS::Serverless::Function
@@ -380,6 +428,18 @@ Resources:
       CodeUri: functions/Rollback
       Role: !GetAtt 
         - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+  
+  deleteMLOPS:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mlops-delete
+      Handler: delete-mlops.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/delete-mlops
+      Role: !GetAtt 
+        - IAMRoleForECSdelete
         - Arn
       Timeout: 90
 

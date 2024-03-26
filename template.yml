@@ -439,6 +439,9 @@ Resources:
         - IAMRoleForECSdelete
         - Arn
       Timeout: 90
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref mlopsDynamoDB
 
   ecsAutomationStateMachine:
     Type: AWS::Serverless::StateMachine

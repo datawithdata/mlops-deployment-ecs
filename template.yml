@@ -90,30 +90,27 @@ Resources:
       Policies:
         - PolicyName: mlops-delete
           PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - ec2:DeleteLaunchTemplate
-            - dynamodb:GetItem
-            - ecs:DeleteService
-            - dynamodb:UpdateItem
-            - autoscaling:DeleteAutoScalingGroup
-            - ec2:DeleteLaunchTemplateVersions
-            Resource:
-            - arn:aws:ecs:*:270932919550:service/mlops-*/*
-            - arn:aws:dynamodb:*:270932919550:table/mlops-*
-            - arn:aws:autoscaling:*:270932919550:autoScalingGroup:*:autoScalingGroupName/mlops-*
-            - arn:aws:ec2:*:270932919550:launch-template/*
-          - Effect: Allow
-            Action:
-            - elasticloadbalancing:DescribeLoadBalancerAttributes
-            - elasticloadbalancing:DescribeLoadBalancers
-            - elasticloadbalancing:DescribeListeners
-            - elasticloadbalancing:DeleteTargetGroup
-            - elasticloadbalancing:DeleteRule
-            - elasticloadbalancing:DeleteListener
-            Resource: "*"
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - ec2:DeleteLaunchTemplate
+              - dynamodb:GetItem
+              - ecs:DeleteService
+              - dynamodb:UpdateItem
+              - autoscaling:DeleteAutoScalingGroup
+              - ec2:DeleteLaunchTemplateVersions
+              Resource:
+              - arn:aws:ecs:*:270932919550:service/mlops-*/*
+              - arn:aws:dynamodb:*:270932919550:table/mlops-*
+              - arn:aws:autoscaling:*:270932919550:autoScalingGroup:*:autoScalingGroupName/mlops-*
+              - arn:aws:ec2:*:270932919550:launch-template/*
+            - Effect: Allow
+              Action:
+              - elasticloadbalancing:DeleteTargetGroup
+              - elasticloadbalancing:DeleteRule
+              - elasticloadbalancing:DeleteListener
+              Resource: "*"
 
 
   IAMRoleForECSAutomation:

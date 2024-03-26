@@ -183,7 +183,8 @@
           ],
           "Next": "Rollback"
         }
-      ]
+      ],
+      "Next": "send email"
     },
     "send email": {
       "Type": "Task",

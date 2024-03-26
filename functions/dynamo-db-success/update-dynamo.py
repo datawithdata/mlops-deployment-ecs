@@ -61,7 +61,4 @@ def lambda_handler(event, context):
     # Replace these with your actual values
     _ = update_dynamodb(event)
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps('Successfully update')
-    }
+    return event

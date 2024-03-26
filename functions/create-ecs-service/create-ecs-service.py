@@ -46,9 +46,5 @@ def lambda_handler(event, context):
     except Exception as er:
         print("in error")
         print(str(er))
-        raise 
-   
-    return {
-        'statusCode': 200,
-        'body': 1
-    }
+    
+    return event

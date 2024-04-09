@@ -87,3 +87,8 @@ When a Docker image is built through the Git repository at https://github.com/da
 When a Docker image is built through the Git repository at https://github.com/datawithdata/docker-image, this Python code will be fetched from S3 when Git Actions triggers. The Python code is responsible for updating the DynamoDB Model registry table with information such as ECR version and other configuration details specified by the Data Science team.
 
 ## Architecture
+
+#### **1) Step function**
+
+<img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/architecture-diagram/stepfunctions_graph.png">
+

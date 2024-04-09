@@ -26,8 +26,8 @@ def deploy_service(event):
         ],
         'networkConfiguration': {
             'awsvpcConfiguration': {
-                'securityGroups': ['sg-0aeecd47559449290'],
-                'subnets': ['subnet-046ece9627560a66a','subnet-030e86ba4defd393f','subnet-0b163826522f34c48']
+                'securityGroups': os.environ['SG'],
+                'subnets': [os.environ[SUBNETS]]
             }
         },
     }

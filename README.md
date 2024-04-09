@@ -10,9 +10,9 @@ Once this repository is deployed within an AWS account, it will automatically pr
 
 ## Installation
 
-Ensure that you provide the required values in dev.json, qa.json, and prod.json, such as account IDs, the desired AWS region for automation deployment, VPC configurations, etc.
+Make sure you fill in the necessary details in dev.json, qa.json, and prod.json, including account IDs, the preferred AWS region for automating deployment, VPC configurations, etc.
 
-Once the necessary information is provided, proceed to move your code to the respective branches such as dev, qa, and prod to deploy the ECS automation in each of your environments.
+After providing the essential information, move your code to the appropriate branches such as dev, qa, and prod to execute ECS automation in each environment. This will trigger Git Actions using the OIDC role, deploying all required code into respective AWS services using AWS CloudFormation template.
 
 ## Lambdas_Python_Scripts
 

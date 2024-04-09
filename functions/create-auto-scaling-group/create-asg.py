@@ -106,7 +106,7 @@ def create_asg(event):
             MinSize=1,
             MaxSize=5,
             DesiredCapacity=1,
-            VPCZoneIdentifier="subnet-046ece9627560a66a,subnet-030e86ba4defd393f,subnet-0b163826522f34c48",
+            VPCZoneIdentifier=os.environ['SUBNETS'],
             # ... other parameters (e.g., VPC ID, subnet IDs, security group IDs)
         )
         

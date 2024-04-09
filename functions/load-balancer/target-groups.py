@@ -39,7 +39,7 @@ def create_target_group(event):
             Name=event['registry-name'],
             Protocol='HTTP',
             Port=80,
-            VpcId='vpc-0b4da02d066d1e2af',
+            VpcId=os.environ['VPC'],
             HealthCheckProtocol='HTTP',
             HealthCheckPort='5000',
             HealthCheckEnabled=True,

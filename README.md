@@ -77,6 +77,10 @@ This function registers a model, storing metadata in DynamoDB. The following sam
   
 This function retrieves the list of models registered in the model registry, which is exposed as a REST API endpoint.
 
-#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/git-actions.png" width="20" height="20"> **10) download-s3** 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/git-actions.png" width="30" height="30"> **11) download-s3** 
   
 When a Docker image is built through the Git repository at https://github.com/datawithdata/docker-image, this Python code will be retrieved from S3 upon Git Actions triggers. The Python code is designed to download the machine learning (ML) model when Git Actions triggers occur. It fetches the ML model from S3, utilizing metadata retrieved from DynamoDB, which is generated through the model-registry function. 
+
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/git-actions.png" width="30" height="30"> **12) dynamodb-git-update** 
+  
+When a Docker image is built through the Git repository at https://github.com/datawithdata/docker-image, this Python code will be fetched from S3 when Git Actions triggers. The Python code is responsible for updating the DynamoDB Model registry table with information such as ECR version and other configuration details specified by the Data Science team.

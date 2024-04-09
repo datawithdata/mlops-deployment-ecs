@@ -40,6 +40,9 @@ The majority of our automation is orchestrated through our Lambdas with the assi
   
   This function is tasked with deploying a container stored in Amazon Elastic Container Registry (ECR) to an ECS cluster running on EC2 servers, utilizing Auto Scaling Groups previously created by the create-auto-scaling-group function.
 
+  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) dynamo-db-success ** 
+  
+This function handles the update of DynamoDB with listener ARN, target group ARN, and Load Balancer URL. This update facilitates the retrieval of the Load Balancer URL for predictions and is also employed for deleting the entire ML model deployed, ranging from ECS cluster to listeners and target groups.
 
 
 

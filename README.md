@@ -5,7 +5,7 @@ Once this repository is deployed within an AWS account, it will automatically pr
 ## Table of Contents
 
 - [Installation](#installation)
-- [Lambdas Python Scripts](#LambdasPythonScripts)
+- [Lambdas Python Scripts](#Lambdas_Python_Scripts)
 - [Architecture](#Architecture)
 
 ## Installation
@@ -14,7 +14,7 @@ Ensure that you provide the required values in dev.json, qa.json, and prod.json,
 
 Once the necessary information is provided, proceed to move your code to the respective branches such as dev, qa, and prod to deploy the ECS automation in each of your environments.
 
-## Lambdas Python Scripts
+## Lambdas_Python_Scripts
 
 The majority of our automation is orchestrated through our Lambdas with the assistance of Step Functions. In this section, we'll provide an overview of the high-level functions performed by each Lambda.
 

@@ -355,6 +355,7 @@ Resources:
           ARN: !GetAtt mlopsInstanceProfile.Arn
           bool: "True"
           AMI_ID: !Ref imageID
+          SUBNETS: !Sub subnets
   
 
   deployECS:
@@ -368,6 +369,10 @@ Resources:
         - IAMRoleForECSAutomation
         - Arn
       Timeout: 90
+      Environment:
+        Variables:
+          SUBNETS: !Sub subnets
+          SG: [!Ref albSecurituGroup]
   
   createTaskCluster:
     Type: AWS::Serverless::Function
@@ -399,6 +404,7 @@ Resources:
         Variables:
           LOADBALANCER_ARN: !Ref mlopsLoadBalancer
           TABLE_NAME: !Ref mlopsDynamoDB
+          VPC: !Sub vpc
 
   updateDynamoSuccess:
     Type: AWS::Serverless::Function

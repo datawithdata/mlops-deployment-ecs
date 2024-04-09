@@ -372,7 +372,7 @@ Resources:
       Environment:
         Variables:
           SUBNETS: !Sub subnets
-          SG: [!Ref albSecurituGroup]
+          SG: !Ref albSecurituGroup
   
   createTaskCluster:
     Type: AWS::Serverless::Function

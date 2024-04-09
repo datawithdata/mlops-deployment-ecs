@@ -59,7 +59,8 @@ which will be exposed as REST API using API gateway.
 
 #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **6) model-registry ** 
   
-This function is used to register a model in to DynamoDB. 
+This function registers a model, storing metadata in DynamoDB. The following sample includes accuracy information for trained ML models, with **Accurecy** parameters customized for individual users.
+
 
 ```bash
 {
@@ -67,7 +68,7 @@ This function is used to register a model in to DynamoDB.
   "versions": [
     {
       "s3_location": "Location of the trained ML model in Amazon S3.",
-      "Accurecy": { Accuracy information for ML models, with parameters tailored to individual users.
+      "Accurecy": { 
         "auc": 11,
         "Roc": 22
       }

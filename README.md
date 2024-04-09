@@ -57,4 +57,21 @@ In the event of any failure during the deployment of the machine learning (ML) m
 This function is employed to remove the complete deployment flow, starting from the target group, listeners, auto-scaling group, launch template, and ECS service.
 which will be exposed as REST API using API gateway. 
 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **6) model-registry ** 
+  
+This function is used to register a model in to DynamoDB. 
+
+```bash
+{
+  "registry-name": "model-registry-name",
+  "versions": [
+    {
+      "s3_location": "Location of the trained ML model in Amazon S3.",
+      "Accurecy": { Accuracy information for ML models, with parameters tailored to individual users.
+        "auc": 11,
+        "Roc": 22
+      }
+    }
+  ]
+}
 

@@ -92,6 +92,6 @@ When a Docker image is built through the Git repository at https://github.com/da
 
 <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/architecture-diagram/stepfunctions_graph.png">
 
-#### **2) ECS auto deployment Architecture
+#### **2) ECS auto deployment Architecture**
 
 <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/architecture-diagram/ECS-architecure.png">

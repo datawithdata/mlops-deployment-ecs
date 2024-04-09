@@ -75,4 +75,3 @@ This function registers a model, storing metadata in DynamoDB. The following sam
     }
   ]
 }
-

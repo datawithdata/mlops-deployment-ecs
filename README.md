@@ -52,5 +52,9 @@ This function is responsible for sending email notifications upon the successful
   
 In the event of any failure during the deployment of the machine learning (ML) model in ECS, this process will initiate a rollback, reverting all steps to their previous states.
 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) delete-mlops ** 
+  
+This function is employed to remove the complete deployment flow, starting from the target group, listeners, auto-scaling group, launch template, and ECS service.
+which will be exposed as REST API using API gateway. 
 
 

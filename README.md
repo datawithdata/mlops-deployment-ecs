@@ -36,28 +36,28 @@ The majority of our automation is orchestrated through our Lambdas with the assi
   1) It creates an EC2 Launch Template with configuration details such as instance type and EBS settings.
   2) It sets up EC2 Auto Scaling groups, which are utilized for deploying our ECS containers on EC2 instances, as well as managing scaling operations for increasing and decreasing capacity as needed.
   
-  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **4) create-ecs-service ** 
+  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **4) create-ecs-service** 
   
   This function is tasked with deploying a container stored in Amazon Elastic Container Registry (ECR) to an ECS cluster running on EC2 servers, utilizing Auto Scaling Groups previously created by the create-auto-scaling-group function.
 
-  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) dynamo-db-success ** 
+  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) dynamo-db-success** 
   
 This function handles the update of DynamoDB with listener ARN, target group ARN, and Load Balancer URL. This update facilitates the retrieval of the Load Balancer URL for predictions and is also employed for deleting the entire ML model deployed, ranging from ECS cluster to listeners and target groups.
 
-  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) send-success-email ** 
+  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **6) send-success-email** 
   
 This function is responsible for sending email notifications upon the successful deployment of a machine learning (ML) model in an ECS cluster.
 
-#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) Rollback ** 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **7) Rollback** 
   
 In the event of any failure during the deployment of the machine learning (ML) model in ECS, this process will initiate a rollback, reverting all steps to their previous states.
 
-#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) delete-mlops ** 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **8) delete-mlops** 
   
 This function is employed to remove the complete deployment flow, starting from the target group, listeners, auto-scaling group, launch template, and ECS service.
 which will be exposed as REST API using API gateway. 
 
-#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **6) model-registry ** 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **9) model-registry** 
   
 This function registers a model, storing metadata in DynamoDB. The following sample includes accuracy information for trained ML models, with **Accurecy** parameters customized for individual users.
 
@@ -78,6 +78,6 @@ This function registers a model, storing metadata in DynamoDB. The following sam
 ```
 
 
-#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **6) list-registry ** 
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **10) list-registry** 
   
 This function retrieves the list of models registered in the model registry, exposed as a REST API.

@@ -5,12 +5,7 @@ Once this repository is deployed within an AWS account, it will automatically pr
 ## Table of Contents
 
 - [Installation](#installation)
-- [Lambdas](#Lambdas)
-- [Python Scripts](#python-scripts)
-  - [Script 1](#script-1)
-  - [Script 2](#script-2)
-- [Contributing](#contributing)
-- [License](#license)
+- [Lambdas Python Scripts](#Lambdas)
 
 ## Installation
 

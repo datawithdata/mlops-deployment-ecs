@@ -1,4 +1,4 @@
-name: Deploy Lambda
+name: Deploy ECS Automation
 
 on:
   push:
@@ -25,11 +25,16 @@ jobs:
         with:
             role-to-assume: arn:aws:iam::270932919550:role/git-actions-iam 
             aws-region: us-east-1
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
       
       - name: Read parameters from JSON file
         id: read_params
         run: |
-          echo ::set-output name=params::$(cat dev.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')
+          echo ::set-output name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 
 
       - run: sam build --use-container

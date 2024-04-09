@@ -22,23 +22,23 @@ Once the necessary information is provided, proceed to move your code to the res
 
 The majority of our automation is orchestrated through our Lambdas with the assistance of Step Functions. In this section, we'll provide an overview of the high-level functions performed by each Lambda.
 
-#### **1) load-balancer**
-
-This function is responsible for creating target groups and listeners within an existing AWS Application Load Balancer. It also dynamically assigns ports for each listener.
-#### **2) create-task-cluster**
-
-This function is responsible for creating an ECS cluster and registering a task (task definition) that is utilized to deploy a container from Amazon Elastic Container Registry (ECR).
-
-### **3) create-auto-scaling-group**
-
-This function handles the creation of two main components:
-
-1) It creates an EC2 Launch Template with configuration details such as instance type and EBS settings.
-2) It sets up EC2 Auto Scaling groups, which are utilized for deploying our ECS containers on EC2 instances, as well as managing scaling operations for increasing and decreasing capacity as needed.
-
-### **4) create-ecs-service **
-
-This function is tasked with deploying a container stored in Amazon Elastic Container Registry (ECR) to an ECS cluster running on EC2 servers, utilizing Auto Scaling Groups previously created by the create-auto-scaling-group function.
+  #### **1) load-balancer**
+  
+  This function is responsible for creating target groups and listeners within an existing AWS Application Load Balancer. It also dynamically assigns ports for each listener.
+  #### **2) create-task-cluster**
+  
+  This function is responsible for creating an ECS cluster and registering a task (task definition) that is utilized to deploy a container from Amazon Elastic Container Registry (ECR).
+  
+  #### **3) create-auto-scaling-group**
+  
+  This function handles the creation of two main components:
+  
+  1) It creates an EC2 Launch Template with configuration details such as instance type and EBS settings.
+  2) It sets up EC2 Auto Scaling groups, which are utilized for deploying our ECS containers on EC2 instances, as well as managing scaling operations for increasing and decreasing capacity as needed.
+  
+  #### **4) create-ecs-service **
+  
+  This function is tasked with deploying a container stored in Amazon Elastic Container Registry (ECR) to an ECS cluster running on EC2 servers, utilizing Auto Scaling Groups previously created by the create-auto-scaling-group function.
 
 
 

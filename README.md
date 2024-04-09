@@ -44,7 +44,13 @@ The majority of our automation is orchestrated through our Lambdas with the assi
   
 This function handles the update of DynamoDB with listener ARN, target group ARN, and Load Balancer URL. This update facilitates the retrieval of the Load Balancer URL for predictions and is also employed for deleting the entire ML model deployed, ranging from ECS cluster to listeners and target groups.
 
+  #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) send-success-email ** 
+  
+This function is responsible for sending email notifications upon the successful deployment of a machine learning (ML) model in an ECS cluster.
+
+#### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **5) Rollback ** 
+  
+In the event of any failure during the deployment of the machine learning (ML) model in ECS, this process will initiate a rollback, reverting all steps to their previous states.
 
 
-```bash
-pip install -r requirements.txt
+

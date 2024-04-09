@@ -22,7 +22,7 @@ Once the necessary information is provided, proceed to move your code to the res
 
 The majority of our automation is orchestrated through our Lambdas with the assistance of Step Functions. In this section, we'll provide an overview of the high-level functions performed by each Lambda.
 
-# load-balancer
+#### **1) load-balancer**
 
 This function is responsible for creating target groups and listeners within an existing AWS Application Load Balancer. It also dynamically assigns ports for each listener.
 

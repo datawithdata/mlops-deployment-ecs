@@ -6,8 +6,6 @@ import base64
 ec2_client = boto3.client('ec2')
 client_asg = boto3.client('autoscaling')
 
-
-
 """def get_instance_id(event):
     # TODO implement
     try:

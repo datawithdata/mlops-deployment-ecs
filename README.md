@@ -25,6 +25,11 @@ The majority of our automation is orchestrated through our Lambdas with the assi
 #### **1) load-balancer**
 
 This function is responsible for creating target groups and listeners within an existing AWS Application Load Balancer. It also dynamically assigns ports for each listener.
+#### **2) create-task-cluster**
+
+This function is responsible for creating an ECS cluster and registering a task (task definition) that is utilized to deploy a container from Amazon Elastic Container Registry (ECR).
+
+### **3) create-auto-scaling-group
 
 ```bash
 pip install -r requirements.txt

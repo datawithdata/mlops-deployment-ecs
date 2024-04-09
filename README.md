@@ -14,6 +14,8 @@ Make sure you fill in the necessary details in dev.json, qa.json, and prod.json,
 
 After providing the essential information, move your code to the appropriate branches such as dev, qa, and prod to execute ECS automation in each environment. This will trigger Git Actions using the OIDC role, deploying all required code into respective AWS services using AWS CloudFormation template.
 
+Note: Please create an OpenID Connect (OIDC) role within AWS with permissions granted for CodeBuild and CloudFormation access, update the OIDC role in the Git workflow
+
 ## Lambdas_Python_Scripts
 
 The majority of our automation is orchestrated through our Lambdas with the assistance of Step Functions. In this section, we'll provide an overview of the high-level functions performed by each Lambda.

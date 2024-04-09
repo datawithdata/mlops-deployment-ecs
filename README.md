@@ -5,7 +5,8 @@ Once this repository is deployed within an AWS account, it will automatically pr
 ## Table of Contents
 
 - [Installation](#installation)
-- [Lambdas Python Scripts](#Lambdas)
+- [Lambdas Python Scripts](#LambdasPythonScripts)
+- [Architecture](#Architecture)
 
 ## Installation
 
@@ -13,7 +14,7 @@ Ensure that you provide the required values in dev.json, qa.json, and prod.json,
 
 Once the necessary information is provided, proceed to move your code to the respective branches such as dev, qa, and prod to deploy the ECS automation in each of your environments.
 
-## Lambdas
+## Lambdas Python Scripts
 
 The majority of our automation is orchestrated through our Lambdas with the assistance of Step Functions. In this section, we'll provide an overview of the high-level functions performed by each Lambda.
 
@@ -84,3 +85,5 @@ When a Docker image is built through the Git repository at https://github.com/da
 #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/git-actions.png" width="30" height="30"> **12) dynamodb-git-update** 
   
 When a Docker image is built through the Git repository at https://github.com/datawithdata/docker-image, this Python code will be fetched from S3 when Git Actions triggers. The Python code is responsible for updating the DynamoDB Model registry table with information such as ECR version and other configuration details specified by the Data Science team.
+
+## Architecture

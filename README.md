@@ -80,4 +80,4 @@ This function registers a model, storing metadata in DynamoDB. The following sam
 
 #### <img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/apigateway.png" width="20" height="20"><img src="https://github.com/datawithdata/mlops-deployment-ecs/blob/main/logos/lambda.png" width="20" height="20"> **10) list-registry** 
   
-This function retrieves the list of models registered in the model registry, exposed as a REST API.
+This function retrieves the list of models registered in the model registry, which is exposed as a REST API endpoint.

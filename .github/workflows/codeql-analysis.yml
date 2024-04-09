@@ -1,0 +1,35 @@
+name: CodeQL Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  analyze:
+    name: Analyze Python code with CodeQL
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language-version: [3.6, 3.7, 3.8, 3.9]  # Choose the Python versions you want to analyze
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: python
+        python-version: ${{ matrix.language-version }}
+
+    - name: Build
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # Install your project's dependencies
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1

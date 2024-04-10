@@ -67,6 +67,9 @@ Resources:
               - "ecs:RegisterContainerInstance"
               - "ecs:StartTelemetrySession"
               - "ecs:Submit*"
+              - "ecs:DescribeServices"
+              - "ecs:DescribeTasks"
+              - "ecs:DescribeClusters"
               - "ecr:GetAuthorizationToken"
               - "ecr:BatchCheckLayerAvailability"
               - "ecr:GetDownloadUrlForLayer"
@@ -456,6 +459,21 @@ Resources:
       Handler: send-email.lambda_handler
       Runtime: python3.9
       CodeUri: functions/send-success-email
+      Role: !GetAtt 
+        - IAMRoleForECSdelete
+        - Arn
+      Timeout: 90
+      Environment:
+        Variables:
+          LOADBALANCER_NAME: !GetAtt mlopsLoadBalancer.DNSName
+  
+  checkServiceStatus:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mlops-check-ecs-service-status
+      Handler: check-deployment-status.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/check-deployment-status
       Role: !GetAtt 
         - IAMRoleForECSdelete
         - Arn

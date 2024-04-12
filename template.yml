@@ -353,6 +353,28 @@ Resources:
       Name: mlops-ecs
       Description: APIs for deploying and monitoring the ECS deployments.
 
+  mlopsInitiateResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref mlopsAPI
+      ParentId: !GetAtt mlopsAPI.RootResourceId
+      PathPart: initiate-deployment
+  
+  mlopsInitiateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      HttpMethod: POST
+      ResourceId: !Ref mlopsInitiateResource
+      RestApiId: !Ref mlopsAPI
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - LambdaArn: !GetAtt initiatePipeline.Arn
+
   mlopsAPIDeployment:
     Type: AWS::ApiGateway::Deployment
     Properties:
@@ -360,14 +382,22 @@ Resources:
       StageName: Prod       # Specify the desired stage name (replace with your stage)
       Description: Deployment to Prod Stage
 
-
+  mlopsApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: mlopsApiKey
+      Enabled: true
+      Description: Key for accessing mlops APIs
+      StageKeys:
+        - RestApiId: !Ref mlopsAPI
+          StageName: !Ref mlopsAPIDeployment
 
   mlopsUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
     Properties:
       ApiStages:
       - ApiId: !Ref mlopsAPI
-        Stage: Prod  # Replace with your deployment stage name
+        Stage: !Ref mlopsAPIDeployment  # Replace with your deployment stage name
       Description: My Usage Plan for controlled access
       Quota:
         Limit: 5000  # Adjust quota limit as needed
@@ -375,12 +405,6 @@ Resources:
       Throttle:
         BurstLimit: 200
         RateLimit: 100
-
-  mlopsApiKey:
-    Type: AWS::ApiGateway::ApiKey
-    Properties:
-      Name: mlopsApiKey
-      Description: Key for accessing mlops APIs
 
   mlopsApiKeyUsagePlanBinding:
     Type: AWS::ApiGateway::UsagePlanKey
@@ -566,12 +590,7 @@ Resources:
       Environment:
         Variables:
           LOADBALANCER_NAME: !GetAtt ecsAutomationStateMachine.Arn
-      Events:
-        mlopsAPI:
-          Type: Api
-          Properties:
-            Path: /initiate-mlops
-            Method: POST
+
 
   ecsAutomationStateMachine:
     Type: AWS::Serverless::StateMachine

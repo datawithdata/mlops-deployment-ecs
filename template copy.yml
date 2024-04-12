@@ -356,11 +356,55 @@ Resources:
       Name: mlops-ecs
       Description: APIs for deploying and monitoring the ECS deployments.
 
+  mlopsInitiateResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref mlopsAPI
+      ParentId: !GetAtt mlopsAPI.RootResourceId
+      PathPart: initiate-deployment
+  
+  mlopsInitiateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      HttpMethod: POST
+      ResourceId: !Ref mlopsInitiateResource
+      RestApiId: !Ref mlopsAPI
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - LambdaArn: !GetAtt initiatePipeline.Arn
+    
+  mlopsdeleteResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref mlopsAPI
+      ParentId: !GetAtt mlopsAPI.RootResourceId
+      PathPart: mlops-delete
+  
+  mlopsdeleteMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      HttpMethod: POST
+      ResourceId: !Ref mlopsdeleteResource
+      RestApiId: !Ref mlopsAPI
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - LambdaArn: !GetAtt deleteMLOPS.Arn
+
   mlopsAPIDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn: 
-        - initiatePipeline
-        - deleteMLOPS
+        - mlopsInitiateMethod
+        - mlopsdeleteMethod
     Properties:
       RestApiId: !Ref mlopsAPI  # Reference the API Gateway resource
       StageName: !Ref stage       # Specify the desired stage name (replace with your stage)
@@ -532,15 +576,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref mlopsDynamoDB
-      Events:
-        MyApiEvent:
-          Type: Api
-          Properties:
-            Path: /mlops-delete
-            Method: POST
-            RestApiId: !Ref mlopsAPI
-            Auth:
-              ApiKeyRequired: true
+
   sendEmail:
     Type: AWS::Serverless::Function
     Properties:
@@ -582,15 +618,6 @@ Resources:
       Environment:
         Variables:
           LOADBALANCER_NAME: !GetAtt ecsAutomationStateMachine.Arn
-      Events:
-        MyApiEvent:
-          Type: Api
-          Properties:
-            Path: /initiate-deployment
-            Method: POST
-            RestApiId: !Ref mlopsAPI
-            Auth:
-              ApiKeyRequired: true
 
 
   ecsAutomationStateMachine:

@@ -14,6 +14,7 @@ client = boto3.client('stepfunctions')
 
 def lambda_handler(event, context):
     # TODO implement
-    payload=json.dumps(event['config'])
+    data=json.loads(event['body'])
+    payload=json.dumps(data['config'])
     response = client.start_execution(stateMachineArn=os.environ['STEPFUNCTION_ARN'],input=payload)
     return "Successfully ini"

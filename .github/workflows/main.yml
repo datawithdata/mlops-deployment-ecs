@@ -19,7 +19,13 @@ jobs:
       - uses: actions/setup-python@v3
       - uses: aws-actions/setup-sam@v2
 
-
+      - name: Read parameters from JSON file
+        id: read_params
+        run: |
+          echo "name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')" >> $GITHUB_OUTPUT
+      - name: emo
+        run: echo steps.read_params.outputs.params
+        
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -31,11 +37,6 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       
-      - name: Read parameters from JSON file
-        id: read_params
-        run: |
-          echo name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]') >> $GITHUB_OUTPUT
-
 
       - run: sam build --use-container
 

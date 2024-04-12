@@ -34,7 +34,7 @@ jobs:
       - name: Read parameters from JSON file
         id: read_params
         run: |
-          echo ::set-output name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')
+          echo name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]') >> $GITHUB_OUTPUT
 
 
       - run: sam build --use-container

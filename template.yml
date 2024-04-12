@@ -262,17 +262,19 @@ Resources:
   IAMRoleForStateMachine:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: mlops-delete-role
+      RoleName: mlops-state-machine
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              Service: lambda.amazonaws.com
+              Service: 
+                - lambda.amazonaws.com
+                - states.amazonaws.com
             Action: sts:AssumeRole
       Path: /
       Policies:
-        - PolicyName: mlops-delete
+        - PolicyName: mlops-state-execution
           PolicyDocument:
             Version: "2012-10-17"
             Statement: 
@@ -288,6 +290,7 @@ Resources:
               - "logs:CreateLogStream"
               - "logs:PutLogEvents"
               Resource: '*'
+ 
   albSecurituGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

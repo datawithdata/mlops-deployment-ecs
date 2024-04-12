@@ -67,6 +67,9 @@ Resources:
               - "ecs:RegisterContainerInstance"
               - "ecs:StartTelemetrySession"
               - "ecs:Submit*"
+              - "ecs:DescribeServices"
+              - "ecs:DescribeTasks"
+              - "ecs:DescribeClusters"
               - "ecr:GetAuthorizationToken"
               - "ecr:BatchCheckLayerAvailability"
               - "ecr:GetDownloadUrlForLayer"
@@ -101,10 +104,10 @@ Resources:
               - autoscaling:DeleteAutoScalingGroup
               - ec2:DeleteLaunchTemplateVersions
               Resource:
-              - arn:aws:ecs:*:270932919550:service/mlops-*/*
-              - arn:aws:dynamodb:*:270932919550:table/mlops-*
-              - arn:aws:autoscaling:*:270932919550:autoScalingGroup:*:autoScalingGroupName/mlops-*
-              - arn:aws:ec2:*:270932919550:launch-template/*
+              - !Sub  arn:aws:ecs:${region}:${accountid}:service/mlops-*/*
+              - !Sub  arn:aws:dynamodb:${region}:${accountid}:table/mlops-*
+              - !Sub  arn:aws:autoscaling:${region}:${accountid}:autoScalingGroup:*:autoScalingGroupName/mlops-*
+              - !Sub  arn:aws:ec2:${region}:${accountid}:launch-template/*
             - Effect: Allow
               Action:
               - elasticloadbalancing:DeleteTargetGroup
@@ -256,7 +259,35 @@ Resources:
                   - 'logs:PutLogEvents'
                 Resource: '*'
 
-
+  IAMRoleForStateMachine:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: mlops-delete-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: mlops-delete
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: 
+            - Effect: "Allow"
+              Action: 
+              - "states:StartExecution"
+              - "logs:CreateLogGroup"
+              Resource: 
+              - !Sub  "arn:aws:states:${region}:${accountid}:stateMachine:mlops-*"
+              - !Sub  "arn:aws:logs:${region}:${accountid}:log-group:mlops-*"
+            - Effect: "Allow"
+              Action: 
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              Resource: '*'
   albSecurituGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -312,6 +343,39 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  mlopsAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: mlops-ecs
+      Description: APIs for deploying and monitoring the ECS deployments.
+
+  mlopsUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+      - ApiId: !Ref mlopsAPI
+        Stage: Prod  # Replace with your deployment stage name
+      Description: My Usage Plan for controlled access
+      Quota:
+        Limit: 5000  # Adjust quota limit as needed
+        Period: MONTH
+      Throttle:
+        BurstLimit: 200
+        RateLimit: 100
+
+  mlopsApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: mlopsApiKey
+      Description: Key for accessing mlops APIs
+
+  mlopsApiKeyUsagePlanBinding:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref mlopsApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref mlopsUsagePlan
 
   modelRegistryList:
     Type: AWS::Serverless::Function
@@ -430,7 +494,7 @@ Resources:
       Runtime: python3.9
       CodeUri: functions/Rollback
       Role: !GetAtt 
-        - IAMRoleForECSAutomation
+        - IAMRoleForECSdelete
         - Arn
       Timeout: 90
   
@@ -457,17 +521,50 @@ Resources:
       Runtime: python3.9
       CodeUri: functions/send-success-email
       Role: !GetAtt 
-        - IAMRoleForECSdelete
+        - IAMRoleForECSAutomation
         - Arn
       Timeout: 90
       Environment:
         Variables:
           LOADBALANCER_NAME: !GetAtt mlopsLoadBalancer.DNSName
+  
+  checkServiceStatus:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mlops-check-ecs-service-status
+      Handler: check-deployment-status.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/check-deployment-status
+      Role: !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
+      Timeout: 90
+
+  initiatePipeline:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mlops-check-ecs-service-status
+      Handler: initiate-mlops-pipeline.lambda_handler
+      Runtime: python3.9
+      CodeUri: functions/initiate-mlops-pipeline
+      Role: !GetAtt 
+        - IAMRoleForStateMachine
+        - Arn
+      Timeout: 90
+      Environment:
+        Variables:
+          LOADBALANCER_NAME: !GetAtt ecsAutomationStateMachine.Arn
+      Events:
+        mlopsAPI:
+          Type: Api
+          Properties:
+            Path: /initiate-mlops
+            Method: POST
 
   ecsAutomationStateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
-       Name: ecs-automation-statemachine
+       Name: mlops-ecs-automation-statemachine
        DefinitionUri: stepfunctions/ecs-automation.asl.json
        DefinitionSubstitutions:
           create-target-listner: !GetAtt createTargetListners.Arn

@@ -153,7 +153,45 @@
           "Next": "Rollback"
         }
       ],
-      "Next": "update DynamoDB"
+      "Next": "check service status"
+    },
+    "check service status": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${checkServiceStatus}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Choice"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "Inprogress",
+          "Next": "check service status"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "deployed",
+          "Next": "update DynamoDB"
+        }
+      ]
     },
     "update DynamoDB": {
       "Type": "Task",

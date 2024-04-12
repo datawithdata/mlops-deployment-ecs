@@ -14,7 +14,7 @@ dynamodb = boto3.resource('dynamodb')
 
 
 def get_registry_info(event):
-    table_name = "siri-model-registry"
+    table_name = os.environ['TABLE_NAME']
     table = dynamodb.Table(table_name)
     response = table.get_item(
         Key={"registry-name": event['data']['registry-name']})

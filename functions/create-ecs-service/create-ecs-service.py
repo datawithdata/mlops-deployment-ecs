@@ -4,7 +4,7 @@ import os
 ecs_client = boto3.client('ecs')
 client_asg = boto3.client('autoscaling')
 
-
+print(os.environ['SUBNETS'].split(','))
 def deploy_service(event):
 
     desired_count = 1  # Number of tasks to run
@@ -26,8 +26,8 @@ def deploy_service(event):
         ],
         'networkConfiguration': {
             'awsvpcConfiguration': {
-                'securityGroups': os.environ['SG'],
-                'subnets': [os.environ[SUBNETS]]
+                'securityGroups': [os.environ['SG']],
+                'subnets': os.environ['SUBNETS'].split(',')
             }
         },
     }

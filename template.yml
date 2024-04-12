@@ -580,7 +580,7 @@ Resources:
   initiatePipeline:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: mlops-check-ecs-service-status
+      FunctionName: mlops-initiate-mlops
       Handler: initiate-mlops-pipeline.lambda_handler
       Runtime: python3.9
       CodeUri: functions/initiate-mlops-pipeline

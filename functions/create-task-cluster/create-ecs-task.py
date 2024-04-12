@@ -44,7 +44,7 @@ def register_task(event):
         task_definition = {
             "family": "mlops-"+event['data']['registry-name'],
             "cpu": str(int(float(event['data']['cpu'])*1024)),
-            "executionRoleArn":"arn:aws:iam::270932919550:role/ECS-auto-deployment",
+            "executionRoleArn":os.environ['executionRoleArn'],
             "memory": str(int(event['data']['ram'])-512), 
             "networkMode": "awsvpc",
             "requiresCompatibilities": ["EC2"],

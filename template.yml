@@ -27,7 +27,7 @@ Parameters:
     Type: String  
     Description: S3 bucket for storing model artifcats 
   stage:
-    Tyep: String
+    Type: String
     Description: API Gateway Stage
 
 Resources:
@@ -377,14 +377,37 @@ Resources:
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
           - LambdaArn: !GetAtt initiatePipeline.Arn
+    
+  mlopsdeleteResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref mlopsAPI
+      ParentId: !GetAtt mlopsAPI.RootResourceId
+      PathPart: mlops-delete
+  
+  mlopsdeleteMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      HttpMethod: POST
+      ResourceId: !Ref mlopsdeleteResource
+      RestApiId: !Ref mlopsAPI
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
+          - LambdaArn: !GetAtt deleteMLOPS.Arn
 
   mlopsAPIDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn: 
         - mlopsInitiateMethod
+        - mlopsdeleteMethod
     Properties:
       RestApiId: !Ref mlopsAPI  # Reference the API Gateway resource
-      StageName: !REf stage       # Specify the desired stage name (replace with your stage)
+      StageName: !Ref stage       # Specify the desired stage name (replace with your stage)
       Description: Deployment to Prod Stage
 
   mlopsApiKey:
@@ -491,7 +514,9 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref mlopsDynamoDB
-
+          executionRoleArn: !GetAtt 
+                        - IAMRoleForECSAutomation
+                        - Arn
   createTargetListners:
     Type: AWS::Serverless::Function
     Properties:

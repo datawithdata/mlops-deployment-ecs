@@ -344,6 +344,39 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
+  mlopsAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: mlops-ecs
+      Description: APIs for deploying and monitoring the ECS deployments.
+
+  mlopsUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+      - ApiId: !Ref mlopsAPI
+        Stage: Prod  # Replace with your deployment stage name
+      Description: My Usage Plan for controlled access
+      Quota:
+        Limit: 5000  # Adjust quota limit as needed
+        Period: MONTH
+      Throttle:
+        BurstLimit: 200
+        RateLimit: 100
+
+  mlopsApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: mlopsApiKey
+      Description: Key for accessing mlops APIs
+
+  mlopsApiKeyUsagePlanBinding:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref mlopsApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref mlopsUsagePlan
+
   modelRegistryList:
     Type: AWS::Serverless::Function
     Properties:
@@ -521,6 +554,12 @@ Resources:
       Environment:
         Variables:
           LOADBALANCER_NAME: !GetAtt ecsAutomationStateMachine.Arn
+      Events:
+        mlopsAPI:
+          Type: Api
+          Properties:
+            Path: /initiate-mlops
+            Method: POST
 
   ecsAutomationStateMachine:
     Type: AWS::Serverless::StateMachine

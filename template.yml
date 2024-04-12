@@ -377,6 +377,7 @@ Resources:
 
   mlopsAPIDeployment:
     Type: AWS::ApiGateway::Deployment
+    DependsOn: mlopsInitiateMethod
     Properties:
       RestApiId: !Ref mlopsAPI  # Reference the API Gateway resource
       StageName: Prod       # Specify the desired stage name (replace with your stage)

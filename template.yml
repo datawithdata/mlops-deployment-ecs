@@ -353,6 +353,15 @@ Resources:
       Name: mlops-ecs
       Description: APIs for deploying and monitoring the ECS deployments.
 
+  mlopsAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref mlopsAPI  # Reference the API Gateway resource
+      StageName: Prod       # Specify the desired stage name (replace with your stage)
+      Description: Deployment to Prod Stage
+
+
+
   mlopsUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
     Properties:

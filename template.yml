@@ -395,7 +395,7 @@ Resources:
     Properties:
       ApiStages:
       - ApiId: !Ref mlopsAPI
-        Stage: !Ref mlopsAPIDeployment  # Replace with your deployment stage name
+        Stage: Prod  # Replace with your deployment stage name
       Description: My Usage Plan for controlled access
       Quota:
         Limit: 5000  # Adjust quota limit as needed

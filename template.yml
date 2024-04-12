@@ -26,6 +26,9 @@ Parameters:
   mlopsS3BucketName:
     Type: String  
     Description: S3 bucket for storing model artifcats 
+  stage:
+    Tyep: String
+    Description: API Gateway Stage
 
 Resources:
 
@@ -381,7 +384,7 @@ Resources:
         - mlopsInitiateMethod
     Properties:
       RestApiId: !Ref mlopsAPI  # Reference the API Gateway resource
-      StageName: Prod       # Specify the desired stage name (replace with your stage)
+      StageName: !REf stage       # Specify the desired stage name (replace with your stage)
       Description: Deployment to Prod Stage
 
   mlopsApiKey:
@@ -397,7 +400,7 @@ Resources:
     Properties:
       ApiStages:
       - ApiId: !Ref mlopsAPI
-        Stage: Prod  # Replace with your deployment stage name
+        Stage: !Ref stage  # Replace with your deployment stage name
       Description: My Usage Plan for controlled access
       Quota:
         Limit: 5000  # Adjust quota limit as needed

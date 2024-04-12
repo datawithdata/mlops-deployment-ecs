@@ -2,8 +2,10 @@
     "accountid":270932919550,
     "region": "us-east-1",
     "vpc":"vpc-0b4da02d066d1e2af",
-    "subnets": 123,
-    "x86": 123,
-    "arm":123
-
+    "subnets": "subnet-046ece9627560a66a,subnet-030e86ba4defd393f,subnet-0b163826522f34c48",
+    "x86": "ami-07761f3ae34c4478d",
+    "arm":"ami-06723030fbcb3cb75",
+    "mlopsS3BucketName":"mlops-model-registry-270932919550",
+    "imageID": "ami-0e5462b0cdd5ced35",
+"stage":"PROD"
 }

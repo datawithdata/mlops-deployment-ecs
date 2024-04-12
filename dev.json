@@ -6,6 +6,6 @@
     "x86": "ami-07761f3ae34c4478d",
     "arm":"ami-06723030fbcb3cb75",
     "mlopsS3BucketName":"mlops-model-registry-270932919550",
-    "imageID": "ami-0e5462b0cdd5ced35"
-
+    "imageID": "ami-0e5462b0cdd5ced35",
+"stage":"DEV"
 }

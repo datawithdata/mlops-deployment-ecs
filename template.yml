@@ -354,7 +354,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: mlops-ecs
-      StageName: prod
       Description: APIs for deploying and monitoring the ECS deployments.
 
   mlopsAPIStage:

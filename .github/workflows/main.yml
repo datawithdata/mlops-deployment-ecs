@@ -23,9 +23,7 @@ jobs:
         id: read_params
         run: |
           echo "name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')" >> $GITHUB_OUTPUT
-      - name: emo
-        run: echo steps.read_params.outputs.params
-        
+ 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:

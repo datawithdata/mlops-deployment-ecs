@@ -368,7 +368,7 @@ Resources:
 
   mlopsUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
-    DependsOn: mlopsAPIDeployment
+    DependsOn: mlopsApiKey
     Properties:
       ApiStages:
       - ApiId: !Ref mlopsAPI

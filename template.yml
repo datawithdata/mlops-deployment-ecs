@@ -352,6 +352,7 @@ Resources:
 
   mlopsAPI:
     Type: AWS::Serverless::Api
+    StageName: !Ref stage
     Properties:
       Name: mlops-ecs
       Description: APIs for deploying and monitoring the ECS deployments.
@@ -359,7 +360,7 @@ Resources:
   mlopsAPIStage:
     Type: AWS::ApiGateway::Stage
     Properties:
-      StageName: Prod
+      StageName: !Ref stage
       RestApiId: !Ref mlopsAPI
       DeploymentId: !Ref mlopsAPIDeployment
 

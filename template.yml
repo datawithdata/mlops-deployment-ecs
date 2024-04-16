@@ -629,14 +629,18 @@ Resources:
         ZipFile: |
           import subprocess
           import json
+          import cfn_response
           
           def handler(event, context):
               bucket_name = event['ResourceProperties']['BucketName']
               file_paths = event['ResourceProperties']['FilePaths']
-              
-              for file_path in file_paths:
-                  subprocess.run(['aws', 's3', 'cp', file_path, f's3://{bucket_name}/git-actions-code'])
-
+              try:
+                for file_path in file_paths:
+                    subprocess.run(['aws', 's3', 'cp', file_path, f's3://{bucket_name}/git-actions-code'])
+                cfn_response.send(event, context, cfn_response.SUCCESS, {"Message": "File uploaded successfully"})
+              except Exception as e:
+              # Send failure response back to CloudFormation
+                cfn_response.send(event, context, cfn_response.FAILED, {"Error": str(e)})
 
   UploadFileCustomResource:
     Type: Custom::UploadFile

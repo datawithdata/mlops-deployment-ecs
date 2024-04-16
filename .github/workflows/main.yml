@@ -31,10 +31,16 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       
+      
       - name: Read parameters from JSON file
         id: read_params
         run: |
           echo ::set-output name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')
+
+
+      - run: sam build --use-container
+
+      - run: sam deploy --stack-name ecs-automation --parameter-overrides ${{ steps.read_params.outputs.params }} --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 
 
       - name: Get CloudFormation Outputs
         id: cfn_outputs
@@ -44,5 +50,5 @@ jobs:
         
       - name: Download python code
         run: |
-          aws s3 cp functions/dynamodb-git-update/dynamodb-git-update.py s3://$CFN_OUTPUT_VALUE/dynamodb-git-update.py 
-          aws s3 cp functions/download-s3/download-s3.py s3://$CFN_OUTPUT_VALUE/download-s3.py functions/download-s3/download-s3.py
+          aws s3 cp functions/dynamodb-git-update/dynamodb-git-update.py s3://$CFN_OUTPUT_VALUE/git-actions-code/dynamodb-git-update.py 
+          aws s3 cp functions/download-s3/download-s3.py s3://$CFN_OUTPUT_VALUE/git-actions-code/download-s3.py

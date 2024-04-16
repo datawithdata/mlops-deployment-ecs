@@ -31,6 +31,7 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       
+      
       - name: Read parameters from JSON file
         id: read_params
         run: |
@@ -44,10 +45,10 @@ jobs:
       - name: Get CloudFormation Outputs
         id: cfn_outputs
         run: |
-          output_value=$(aws cloudformation describe-stacks --stack-name YourStackName --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
+          output_value=$(aws cloudformation describe-stacks --stack-name ecs-automation --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
           echo "CFN_OUTPUT_VALUE=$output_value" >> $GITHUB_ENV
         
       - name: Download python code
         run: |
-          aws s3 cp functions/dynamodb-git-update/dynamodb-git-update.py s3://$CFN_OUTPUT_VALUE/dynamodb-git-update.py 
-          aws s3 cp functions/download-s3/download-s3.py s3://$CFN_OUTPUT_VALUE/download-s3.py functions/download-s3/download-s3.py
+          aws s3 cp functions/dynamodb-git-update/dynamodb-git-update.py s3://$CFN_OUTPUT_VALUE/git-actions-code/dynamodb-git-update.py 
+          aws s3 cp functions/download-s3/download-s3.py s3://$CFN_OUTPUT_VALUE/git-actions-code/download-s3.py

@@ -607,3 +607,31 @@ Resources:
        Role: !GetAtt 
             - IAMRoleForECSAutomation
             - Arn
+
+  lambdaFunctionFileUpload:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt ecsAutomationStateMachine.Arn
+      Runtime: python3.9
+      Code:
+        ZipFile: |
+          import subprocess
+          import json
+          
+          def handler(event, context):
+              bucket_name = event['ResourceProperties']['BucketName']
+              file_paths = event['ResourceProperties']['FilePaths']
+              
+              for file_path in file_paths:
+                  subprocess.run(['aws', 's3', 'cp', file_path, f's3://{bucket_name}/git-actions-code'])
+
+
+  UploadFileCustomResource:
+    Type: Custom::UploadFile
+    Properties:
+      ServiceToken: !GetAtt lambdaFunctionFileUpload.Arn
+      BucketName: !Ref mlopsS3Bucket
+      FilePath: 
+        - functions/dynamodb-git-update/dynamodb-git-update.py
+        - functions/download-s3/download-s3.py

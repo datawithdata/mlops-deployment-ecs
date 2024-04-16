@@ -7,5 +7,5 @@
     "arm":"ami-06723030fbcb3cb75",
     "mlopsS3BucketName":"mlops-model-registry-270932919550",
     "imageID": "ami-0e5462b0cdd5ced35",
-"stage":"DEV"
+    "stage":"DEV"
 }

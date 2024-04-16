@@ -261,6 +261,15 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
                 Resource: '*'
+        
+        - PolicyName: mlops-s3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                Resource: !Sub mlopsS3BucketName
 
   IAMRoleForStateMachine:
     Type: AWS::IAM::Role
@@ -612,7 +621,9 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Handler: index.handler
-      Role: !GetAtt ecsAutomationStateMachine.Arn
+      Role:  !GetAtt 
+        - IAMRoleForECSAutomation
+        - Arn
       Runtime: python3.9
       Code:
         ZipFile: |

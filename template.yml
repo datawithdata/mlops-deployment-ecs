@@ -617,36 +617,7 @@ Resources:
             - IAMRoleForECSAutomation
             - Arn
 
-  lambdaFunctionFileUpload:
-    Type: AWS::Lambda::Function
-    Properties:
-      Handler: index.handler
-      Role:  !GetAtt 
-        - IAMRoleForECSAutomation
-        - Arn
-      Runtime: python3.9
-      Code:
-        ZipFile: |
-          import subprocess
-          import json
-          import cfn_response
-          
-          def handler(event, context):
-              bucket_name = event['ResourceProperties']['BucketName']
-              file_paths = event['ResourceProperties']['FilePaths']
-              try:
-                for file_path in file_paths:
-                    subprocess.run(['aws', 's3', 'cp', file_path, f's3://{bucket_name}/git-actions-code'])
-                cfn_response.send(event, context, cfn_response.SUCCESS, {"Message": "File uploaded successfully"})
-              except Exception as e:
-              # Send failure response back to CloudFormation
-                cfn_response.send(event, context, cfn_response.FAILED, {"Error": str(e)})
-
-  UploadFileCustomResource:
-    Type: Custom::UploadFile
-    Properties:
-      ServiceToken: !GetAtt lambdaFunctionFileUpload.Arn
-      BucketName: !Ref mlopsS3Bucket
-      FilePath: 
-        - functions/dynamodb-git-update/dynamodb-git-update.py
-        - functions/download-s3/download-s3.py
+Outputs:
+  BucketNameOutput:
+    Description: Name of the S3 bucket created
+    Value: !Ref mlopsS3Bucket

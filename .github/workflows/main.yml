@@ -39,4 +39,15 @@ jobs:
 
       - run: sam build --use-container
 
-      - run: sam deploy --stack-name ecs-automation3 --parameter-overrides ${{ steps.read_params.outputs.params }} --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 
+      - run: sam deploy --stack-name ecs-automation --parameter-overrides ${{ steps.read_params.outputs.params }} --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 
+
+      - name: Get CloudFormation Outputs
+        id: cfn_outputs
+        run: |
+          output_value=$(aws cloudformation describe-stacks --stack-name ecs-automation --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
+          echo "::set-env name=CFN_OUTPUT_VALUE::$output_value"
+        
+      - name: Download python code
+        run: |
+          aws s3 cp functions/dynamodb-git-update/dynamodb-git-update.py s3://$CFN_OUTPUT_VALUE/dynamodb-git-update.py 
+          aws s3 cp functions/download-s3/download-s3.py s3://$CFN_OUTPUT_VALUE/download-s3.py functions/download-s3/download-s3.py

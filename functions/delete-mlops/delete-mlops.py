@@ -20,6 +20,7 @@ def get_details(data):
         matching_dicts = list(filter(lambda item: str(item["version"]) == data['version'], response['Item']['versions']))
         matching_dict = list(filter(lambda item: str(item["version"]) == data['ecr-version'], matching_dicts[0]['ECR-info']))
         print(matching_dict)
+        res = matching_dict.copy()
         del matching_dict[0]['listner_arn']
         del matching_dict[0]['target_group_arn']
         del matching_dict[0]['taskDefinitionArn']
@@ -35,7 +36,7 @@ def get_details(data):
         print("in error")
         print(str(err))
     
-    return matching_dict   
+    return res   
 
 def delete_lb(data):
     print(data)

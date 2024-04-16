@@ -269,7 +269,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - 's3:PutObject'
-                Resource: !Sub mlopsS3BucketName
+                Resource: !GetAtt mlopsS3Bucket.Arn
 
   IAMRoleForStateMachine:
     Type: AWS::IAM::Role

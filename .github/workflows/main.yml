@@ -36,16 +36,11 @@ jobs:
         run: |
           echo ::set-output name=params::$(cat ${{ steps.extract_branch.outputs.branch }}.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]')
 
-
-      - run: sam build --use-container
-
-      - run: sam deploy --stack-name ecs-automation --parameter-overrides ${{ steps.read_params.outputs.params }} --s3-bucket siri-git-actions --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset --no-fail-on-empty-changeset 
-
       - name: Get CloudFormation Outputs
         id: cfn_outputs
         run: |
-          output_value=$(aws cloudformation describe-stacks --stack-name ecs-automation --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
-          echo "::set-env name=CFN_OUTPUT_VALUE::$output_value"
+          output_value=$(aws cloudformation describe-stacks --stack-name YourStackName --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
+          echo "CFN_OUTPUT_VALUE=$output_value" >> $GITHUB_ENV
         
       - name: Download python code
         run: |

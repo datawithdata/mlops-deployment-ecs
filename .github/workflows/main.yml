@@ -39,7 +39,7 @@ jobs:
       - name: Get CloudFormation Outputs
         id: cfn_outputs
         run: |
-          output_value=$(aws cloudformation describe-stacks --stack-name YourStackName --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
+          output_value=$(aws cloudformation describe-stacks --stack-name ecs-automation --query "Stacks[0].Outputs[?OutputKey=='BucketNameOutput'].OutputValue" --output text)
           echo "CFN_OUTPUT_VALUE=$output_value" >> $GITHUB_ENV
         
       - name: Download python code
